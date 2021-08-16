@@ -6,9 +6,7 @@ import createPersistedState from "vuex-persistedstate";
 import auth from './auth'
 import style from './style'
 import header from './header'
-import services from "./services";
-import certificates from './certificates'
-import portfolio from './portfolio'
+import socket from './socket'
 
 Vue.use(Vuex)
 
@@ -19,9 +17,7 @@ export default function (/* { ssrContext } */) {
       auth,
       style,
       header,
-      services,
-      certificates,
-      portfolio,
+      socket,
     },
     plugins: [createPersistedState()],
     // enable strict mode (adds overhead!)
@@ -49,19 +45,10 @@ export default function (/* { ssrContext } */) {
       const newHeader = require('./header').default
       Store.hotUpdate({ modules: { header: newHeader } })
     })
-    module.hot.accept(['./services'], () => {
-      const newServices = require('./services').default
-      Store.hotUpdate({ modules: { services: newServices } })
-    })
-    module.hot.accept(['./certificates'], () => {
-      const newCertificates = require('./certificates').default
-      Store.hotUpdate({ modules: { certificates: newCertificates } })
-    })
-    module.hot.accept(['./portfolio'], () => {
-      const newPortfolio = require('./portfolio').default
-      Store.hotUpdate({ modules: { portfolio: newPortfolio } })
+    module.hot.accept(['./socket'], () => {
+      const newSocket = require('./socket').default
+      Store.hotUpdate({ modules: { socket: newSocket } })
     })
   }
-
   return Store
 }

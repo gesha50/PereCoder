@@ -9,7 +9,6 @@ module.exports = function (ctx) {
     boot: [
       'i18n',
       'vue-socket.io',
-      {path: 'vue-socket.io', server: false},
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -75,7 +74,7 @@ module.exports = function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
-      https: false,
+      https: true,
       port: 8080,
       open: true, // opens browser window automatically
     },

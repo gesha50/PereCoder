@@ -3,10 +3,11 @@ const routes = [
   { path: '/', component: () => import('layouts/MainLayouts'),
     children: [
       { path: '', component: () => import('pages/site/index') },
-      { path: 'services', component: () => import('pages/site/services') },
-      { path: 'works', component: () => import('pages/site/works') },
-      { path: 'contact', component: () => import('pages/site/contact') },
-      { path: 'certificates', component: () => import('pages/site/certificates') },
+      { path: 'new', component: () => import('pages/site/newGame') },
+      { path: 'join', component: () => import('pages/site/joinToGame') },
+      { path: 'setting', component: () => import('pages/site/setting') },
+      { path: 'rules', component: () => import('pages/site/rules') },
+      { path: '/register-game', component: () => import('pages/site/registerGame.vue') },
     ]
   },
 
