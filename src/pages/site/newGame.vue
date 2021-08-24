@@ -31,6 +31,7 @@ export default {
         team: 'black',
         room: room,
         isOrganizer: true,
+        isActive: false
       }, data => {
         if (typeof data == 'string') {
           console.error(data)
@@ -41,6 +42,8 @@ export default {
           team: 'black',
           players: this.players,
           room: room,
+          isOrganizer: true,
+          isActive: false
         })
         this.$router.push(`register-game/${room}`)
       })

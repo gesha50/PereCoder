@@ -5,5 +5,6 @@ export default function () {
     message: [],
     FOUR_GAME_WORDS: [],
     isGameRun: false,
+    threeNumbers: []
   }
 }

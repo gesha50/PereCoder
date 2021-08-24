@@ -5,7 +5,8 @@
       v-for="(word, i) in this.$store.getters['socket/FOUR_GAME_WORDS']"
       :key="i"
     >{{word}}</p>
-
+    <p v-if="isActive">{{secretCode}}</p>
+    <p v-if="isPlayer">Подождите активные игроки подбирают синонимы</p>
     <q-btn color="orange" :label="'Start ' + roundNumber + ' Round'" @click="startRound" />
 
   </q-page>
@@ -14,7 +15,16 @@
 <script>
 export default {
   name: "game",
+  data() {
+    return {
+      isActive: false,
+      isPlayer: false,
+    }
+  },
   computed: {
+    secretCode() {
+      return this.$store.getters["socket/threeNumbers"]
+    },
     currentUser() {
       return this.$store.getters["socket/user"]
     },

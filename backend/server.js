@@ -6,7 +6,7 @@ const app = express();
 const server = createServer(app);
 const users = require('./users')()
 const redis = require("redis");
-const {contains} = require("./functions");
+const {contains, getThreeNumbers} = require("./functions");
 const client = redis.createClient();
 
 const { DICTIONARY_CLASSIC } = require('./dictionaries')
@@ -82,6 +82,7 @@ io.on("connection", socket => {
       'team', user.team,
       'players', user.players,
       'isOrganizer', user.isOrganizer,
+      'isActive', false,
       function(err, res) {
         if (err) console.log(err)
         console.log(res)
@@ -106,6 +107,7 @@ io.on("connection", socket => {
       'team', dataFromClient.team,
       'players', dataFromClient.players ? dataFromClient.players : 0,
       'isOrganizer', dataFromClient.user.isOrganizer,
+      'isActive', false,
       function(err, res) {
         if (err) console.log(err)
         cbToClient(dataFromClient.team)
@@ -166,13 +168,13 @@ io.on("connection", socket => {
         FOUR_WORDS_BLACK = JSON.parse(replies[0])
         FOUR_WORDS_WHITE = JSON.parse(replies[1])
         if (res.team === 'white') {
-          socket.sadd(`room:${dataFromClient.room}:team:white:users`, res.id)
+          client.sadd(`room:${dataFromClient.room}:team:white:users`, res.id)
           socket.join(teamWhite)
           console.log(socket.rooms)
           socket.emit('setFourWords', FOUR_WORDS_WHITE)
         } else {
           console.log('black')
-          socket.sadd(`room:${dataFromClient.room}:team:black:users`, res.id)
+          client.sadd(`room:${dataFromClient.room}:team:black:users`, res.id)
           socket.join(teamBlack)
           console.log(socket.rooms)
           socket.emit('setFourWords', FOUR_WORDS_BLACK)
@@ -204,8 +206,40 @@ io.on("connection", socket => {
     client.smembers(`room:${dataFromClient.room}:team:black:users`, function (e, keys) {
       if (e) console.log(e)
       console.log(keys)
-      let activeIndex = 0
+      // переделать чтобы по кругу было
+      let activeIndex = Math.floor(0 + Math.random() * (keys.length-1 + 1 - 0))
+      client.hgetall(keys[activeIndex], function (e, activeUser){
+        if (e) console.log(e)
+        client.hmset(keys[activeIndex],
+          'id', keys[activeIndex],
+          'name', activeUser.name,
+          'room', activeUser.room,
+          'team', activeUser.team,
+          'players', activeUser.players,
+          'isOrganizer', activeUser.isOrganizer,
+          'isActive', true,
+          function(err, res) {
+            if (err) console.log(err)
+            console.log(res)
+            let multi = client.multi()
+            keys.forEach(blackUser =>{
+              multi.hgetall(blackUser)
+            })
+            multi.exec(function(error, blackUsers) {
+              if (error) console.log(error)
+              blackUsers.forEach(blUser =>{
+                if (blUser.isActive) {
+                  cbToClient()
+                  console.log(socket.rooms)
+                  socket.to(blUser.id).emit('threeNumbers', getThreeNumbers())
+                } else {
+                  cbToClient()
 
+                }
+              })
+            })
+          })
+      })
       let multi = client.multi()
       keys.forEach(blackUser =>{
         multi.hgetall(blackUser)

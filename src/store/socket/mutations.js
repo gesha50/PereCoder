@@ -27,6 +27,10 @@ export function  SOCKET_setTeam (state, data) {
   state.user.team = data[0]
 }
 
+export function  SOCKET_threeNumbers (state, data) {
+  state.threeNumbers = data
+}
+
 export function setUser (state, user) {
   state.user = user
 }
