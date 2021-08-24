@@ -17,15 +17,13 @@ export default {
       // counter: this.$q.localStorage.getItem('counter'),
     }
   },
-  sockets: {
-    connect: function () {
-      console.log('socket connected')
-    }
-  },
   methods: {
     newMes() {
+      // console.log(this.$socket)
       this.$socket.emit('createMessage', {
         text: 'from client'
+      }, dataFromServer => {
+        console.log(dataFromServer)
       })
     }
   },

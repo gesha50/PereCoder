@@ -7,7 +7,8 @@ const routes = [
       { path: 'join', component: () => import('pages/site/joinToGame') },
       { path: 'setting', component: () => import('pages/site/setting') },
       { path: 'rules', component: () => import('pages/site/rules') },
-      { path: '/register-game', component: () => import('pages/site/registerGame.vue') },
+      { path: '/register-game/:room', component: () => import('pages/site/registerGame.vue') },
+      { path: 'game', component: () => import('pages/site/game/game') },
     ]
   },
 

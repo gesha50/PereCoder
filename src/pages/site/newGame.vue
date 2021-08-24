@@ -24,25 +24,25 @@ export default {
     newGame() {
       // this.$socket.emit('test', dataToServer, dataFromServer => {})
       // получить уникальный код комнаты с сервера
-      const room = 1111
+      const room = '1111'
       this.$socket.emit('registerNewGame', {
         name: this.nickname,
         players: this.players,
         team: 'black',
         room: room,
+        isOrganizer: true,
       }, data => {
         if (typeof data == 'string') {
           console.error(data)
         }
-        console.log(data)
         this.setUser({
-          id: data.userId,
+          id: data.id,
           name: this.nickname,
           team: 'black',
           players: this.players,
           room: room,
         })
-        this.$router.push('register-game')
+        this.$router.push(`register-game/${room}`)
       })
     }
   }

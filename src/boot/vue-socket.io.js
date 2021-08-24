@@ -1,7 +1,7 @@
 
 import VueSocketIO from 'vue-socket.io'
 
-export default ({ Vue, store }) => {
+export default async ({ Vue, store }) => {
   Vue.use(new VueSocketIO({
     debug: true,
     connection: 'http://localhost:3001',

@@ -1,6 +1,10 @@
+const redis = require("redis");
+const client = redis.createClient();
+
 class Users {
   constructor() {
     this.users = []
+    this.usersInRoom = []
   }
   add(user) {
     this.users.push(user)
@@ -15,8 +19,17 @@ class Users {
     }
     return user
   }
-  getByRoom(room) {
-    return this.users.filter(user => user.room === room)
+  getAllUsers(key, room, io) {
+    client.keys(key, function (e, usersKeyInRoom){
+      if (e) console.log(e)
+      let multi = client.multi()
+      usersKeyInRoom.forEach(userKeyInRoom =>{
+        multi.hgetall(userKeyInRoom.split(':')[3])
+      })
+      multi.exec(function(err, replies) {
+        io.to(room).emit('updateUsers', replies)
+      })
+    })
   }
 }
 

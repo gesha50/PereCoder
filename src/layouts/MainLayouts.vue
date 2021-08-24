@@ -47,6 +47,11 @@ export default {
     TopHeader,
     Footer,
   },
+  sockets: {
+    connect: function () {
+      console.log('socket connected')
+    }
+  },
   data() {
     return {
       drawer: false,
