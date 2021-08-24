@@ -190,17 +190,45 @@ io.on("connection", socket => {
     client.smembers(`room:${dataFromClient.room}:team:white:users`, function (e, keys) {
       if (e) console.log(e)
       console.log(keys)
-      keys.forEach(key=>{
-        client.hgetall(key, function (e, whiteUser){
-          // выбрать активного игрока из каждой команды
-          // если он активный то
-          // остальным выслать что такой то user сейчас активный
-          if (whiteUser.isActive) {
-            cbToClient('active')
-          } else {
-            cbToClient('player')
-          }
-        })
+      // переделать чтобы по кругу было
+      let activeIndex = Math.floor(0 + Math.random() * (keys.length-1 + 1 - 0))
+      client.hgetall(keys[activeIndex], function (e, activeUser){
+        if (e) console.log(e)
+        client.hmset(keys[activeIndex],
+          'id', keys[activeIndex],
+          'name', activeUser.name,
+          'room', activeUser.room,
+          'team', activeUser.team,
+          'players', activeUser.players,
+          'isOrganizer', activeUser.isOrganizer,
+          'isActive', true,
+          function(err, res) {
+            if (err) console.log(err)
+            console.log(res)
+            let multi = client.multi()
+            keys.forEach(whiteUser =>{
+              multi.hgetall(whiteUser)
+            })
+            multi.exec(function(error, whiteUser) {
+              if (error) console.log(error)
+              whiteUser.forEach(whUser =>{
+                if (whUser.isActive) {
+                  cbToClient()
+                  console.log(socket.rooms)
+                  socket.to(whUser.id).emit('threeNumbers', getThreeNumbers())
+                } else {
+                  cbToClient()
+                }
+              })
+            })
+          })
+      })
+      let multi = client.multi()
+      keys.forEach(whiteUser =>{
+        multi.hgetall(whiteUser)
+      })
+      multi.exec(function(err, replies) {
+        console.log(replies)
       })
     })
     client.smembers(`room:${dataFromClient.room}:team:black:users`, function (e, keys) {
@@ -234,7 +262,6 @@ io.on("connection", socket => {
                   socket.to(blUser.id).emit('threeNumbers', getThreeNumbers())
                 } else {
                   cbToClient()
-
                 }
               })
             })
@@ -245,7 +272,7 @@ io.on("connection", socket => {
         multi.hgetall(blackUser)
       })
       multi.exec(function(err, replies) {
-
+        console.log(replies)
       })
     })
   })
