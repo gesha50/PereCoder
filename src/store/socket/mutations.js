@@ -28,7 +28,15 @@ export function  SOCKET_setTeam (state, data) {
 }
 
 export function  SOCKET_threeNumbers (state, data) {
+  console.log('SOCKET_threeNumbers')
   state.threeNumbers = data
+  state.user.isActive = true
+}
+
+export function  SOCKET_messageToNotActive (state, data) {
+  console.log('messageToNotActive')
+  state.gameMessage = data
+  state.step = 1
 }
 
 export function setUser (state, user) {

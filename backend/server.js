@@ -187,11 +187,10 @@ io.on("connection", socket => {
   // start round
 
   socket.on('startRound', (dataFromClient, cbToClient) => {
-    client.smembers(`room:${dataFromClient.room}:team:white:users`, function (e, keys) {
+    client.smembers(`room:${dataFromClient[0].room}:team:white:users`, function (e, keys) {
       if (e) console.log(e)
-      console.log(keys)
       // переделать чтобы по кругу было
-      let activeIndex = Math.floor(0 + Math.random() * (keys.length-1 + 1 - 0))
+      let activeIndex = 0
       client.hgetall(keys[activeIndex], function (e, activeUser){
         if (e) console.log(e)
         client.hmset(keys[activeIndex],
@@ -212,30 +211,18 @@ io.on("connection", socket => {
             multi.exec(function(error, whiteUser) {
               if (error) console.log(error)
               whiteUser.forEach(whUser =>{
-                if (whUser.isActive) {
-                  cbToClient()
-                  console.log(socket.rooms)
-                  socket.to(whUser.id).emit('threeNumbers', getThreeNumbers())
-                } else {
-                  cbToClient()
+                if (whUser.isActive === 'true') {
+                  io.to(whUser.id).emit('threeNumbers', getThreeNumbers())
                 }
               })
             })
           })
       })
-      let multi = client.multi()
-      keys.forEach(whiteUser =>{
-        multi.hgetall(whiteUser)
-      })
-      multi.exec(function(err, replies) {
-        console.log(replies)
-      })
     })
-    client.smembers(`room:${dataFromClient.room}:team:black:users`, function (e, keys) {
+    client.smembers(`room:${dataFromClient[0].room}:team:black:users`, function (e, keys) {
       if (e) console.log(e)
-      console.log(keys)
       // переделать чтобы по кругу было
-      let activeIndex = Math.floor(0 + Math.random() * (keys.length-1 + 1 - 0))
+      let activeIndex = 0
       client.hgetall(keys[activeIndex], function (e, activeUser){
         if (e) console.log(e)
         client.hmset(keys[activeIndex],
@@ -256,25 +243,16 @@ io.on("connection", socket => {
             multi.exec(function(error, blackUsers) {
               if (error) console.log(error)
               blackUsers.forEach(blUser =>{
-                if (blUser.isActive) {
-                  cbToClient()
-                  console.log(socket.rooms)
-                  socket.to(blUser.id).emit('threeNumbers', getThreeNumbers())
-                } else {
-                  cbToClient()
+                if (blUser.isActive === 'true') {
+                  io.to(blUser.id).emit('threeNumbers', getThreeNumbers())
                 }
               })
             })
           })
       })
-      let multi = client.multi()
-      keys.forEach(blackUser =>{
-        multi.hgetall(blackUser)
-      })
-      multi.exec(function(err, replies) {
-        console.log(replies)
-      })
     })
+    cbToClient()
+    io.to(dataFromClient[0].room).emit('messageToNotActive' ,'Wait please! Active players write a words =)')
   })
 
   // end round

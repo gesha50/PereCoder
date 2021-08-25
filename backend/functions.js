@@ -2,7 +2,7 @@ function getThreeNumbers () {
   let arr = []
   let i = 0
   while (i<3) {
-    let number = Math.floor(0 + Math.random() * (4 + 1 - 0))
+    let number = Math.floor(1 + Math.random() * 4)
     if (i === 0) {
       arr.push(number)
       i++
