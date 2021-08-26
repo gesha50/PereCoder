@@ -8,5 +8,11 @@ export default function () {
     threeNumbers: [],
     gameMessage: null,
     step: 0,
+    isTeamReady: false,
+    threeWhiteAssociation: null,
+    threeBlackAssociation: null,
+    firstNumber: null,
+    secondNumber: null,
+    thirdNumber: null,
   }
 }

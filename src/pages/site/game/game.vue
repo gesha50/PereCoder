@@ -1,13 +1,18 @@
 <template>
   <q-page padding>
-    <h1>Страница игры!</h1>
+    <h4>Страница игры!</h4>
+    <div>Your team: {{currentUser.team}}</div>
     <p
       v-for="(word, i) in this.$store.getters['socket/FOUR_GAME_WORDS']"
       :key="i"
     >{{word}}</p>
-    <div>
+    <div v-if="step === 0">
+        <q-btn :disable="isBtnActive" color="orange" :label="'Start ' + roundNumber + ' Round'" @click="startRound" />
+      {{gameMessage}}
+    </div>
+    <div v-else-if="step === 1">
       <div v-if="secretCode.length" class="bg-blue-grey-2" >
-        code:
+        !!! Secret code:
         <p class="inline-block" v-for="(num,i) in secretCode" :key="i">{{num}}</p>
 
         <div class="q-pa-md" style="max-width: 400px">
@@ -47,9 +52,49 @@
         <p>{{gameMessage}}</p>
       </div>
     </div>
-    <div v-if="step === 0">
-      <q-btn color="orange" :label="'Start ' + roundNumber + ' Round'" @click="startRound" />
+    <div v-else-if="step === 2" class="bg-orange">
+      <div class="flex justify-between">
+        <div>White team association:</div>
+        <div v-if="currentUser.team === 'white'"> It`s your team association! You should to guess this! </div>
+        <div v-else>If you guess this It`s very cool!!!</div>
+      </div>
+      <pre class="inline-block" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc+' | '}}</pre>
+      <q-form
+        @submit="sendTryToGuessSecretCode"
+        @reset="onReset2"
+        class="q-gutter-md"
+      >
+        <q-input
+          @input="updateValue1($event)"
+          class="inline-block"
+          filled
+          style="max-width: 70px"
+          type="number"
+          :value="firstNumber"
+        />
+        <q-input
+          @input="updateValue2($event)"
+          class="inline-block"
+          filled
+          style="max-width: 70px"
+          type="number"
+          :value="secondNumber"
+        />
+        <q-input
+          @input="updateValue3($event)"
+          class="inline-block"
+          filled
+          style="max-width: 70px"
+          type="number"
+          :value="thirdNumber"
+        />
+        <div>
+          <q-btn label="Submit" type="submit" color="primary"/>
+          <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+        </div>
+      </q-form>
     </div>
+
   </q-page>
 </template>
 
@@ -67,8 +112,33 @@ export default {
   },
   updated() {
     console.log('updated')
+    console.log(this.threeWhiteAssociation)
   },
   computed: {
+    isBtnActive() {
+      if (this.isTeamReady) {
+        return true
+      }
+      return false
+    },
+    firstNumber () {
+      return this.$store.getters["socket/firstNumber"]
+    },
+    secondNumber () {
+      return this.$store.getters["socket/secondNumber"]
+    },
+    thirdNumber () {
+      return this.$store.getters["socket/thirdNumber"]
+    },
+    threeWhiteAssociation () {
+      return this.$store.getters["socket/threeWhiteAssociation"]
+    },
+    threeBlackAssociation () {
+      return this.$store.getters["socket/threeBlackAssociation"]
+    },
+    isTeamReady() {
+      return this.$store.getters["socket/isTeamReady"]
+    },
     step() {
       return this.$store.getters["socket/step"]
     },
@@ -95,21 +165,47 @@ export default {
   },
   methods: {
     startRound() {
-      this.$socket.emit('startRound', this.allUsers, dataFromServer => {
+      this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
-        this.message = dataFromServer
       })
     },
     onSubmit () {
-      this.$socket.emit('readyThreeWords', [this.firstWord,this.secondWord,this.thirdWord], dataFromServer => {
-        console.log(dataFromServer)
-      })
+      this.$socket.emit('readyThreeWords',
+        [[this.firstWord,this.secondWord,this.thirdWord], this.currentUser],
+        dataFromServer => {
+          console.log(dataFromServer)
+        })
     },
     onReset () {
       this.firstWord = null
       this.secondWord = null
       this.thirdWord = null
-    }
+    },
+    sendTryToGuessSecretCode() {
+      this.$socket.emit('tryToGuessSecretCode',
+        [[this.firstNumber,this.secondNumber,this.thirdNumber], this.currentUser],
+        dataFromServer => {
+          console.log(dataFromServer)
+        })
+    },
+    onReset2 () {
+      this.$store.dispatch('socket/resetNumbers')
+    },
+    updateValue1(val) {
+      this.$socket.emit('changeNumberOne', [val, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+      })
+    },
+    updateValue2(val) {
+      this.$socket.emit('changeNumberTwo', [val, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+      })
+    },
+    updateValue3(val) {
+      this.$socket.emit('changeNumberThree', [val, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+      })
+    },
   }
 }
 </script>

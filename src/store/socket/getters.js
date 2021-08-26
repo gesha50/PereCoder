@@ -26,3 +26,26 @@ export function gameMessage (state) {
 export function step (state) {
   return state.step
 }
+
+export function isTeamReady (state) {
+  return state.isTeamReady
+}
+
+export function threeWhiteAssociation (state) {
+  return state.threeWhiteAssociation
+}
+
+export function threeBlackAssociation (state) {
+  return state.threeBlackAssociation
+}
+
+export function firstNumber (state) {
+  return state.firstNumber
+}
+export function secondNumber (state) {
+  return state.secondNumber
+}
+export function thirdNumber (state) {
+  return state.thirdNumber
+}
+

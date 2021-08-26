@@ -7,3 +7,7 @@ export function setUserTeam ({commit}, obj) {
   commit('setUserTeam', obj)
 }
 
+export function resetNumbers ({commit}) {
+  commit('resetNumbers')
+}
+

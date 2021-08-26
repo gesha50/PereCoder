@@ -19,6 +19,9 @@ client.on("error", function(error) {
 });
 
 let isGameRun = false
+let isWhiteBtnPress = false
+let isBlackBtnPress = false
+let ROUND = 0
 
 app.use(cors());
 const io = new Server(server, {
@@ -112,6 +115,7 @@ io.on("connection", socket => {
         if (err) console.log(err)
         cbToClient(dataFromClient.team)
         io.to(dataFromClient.user.room).emit('setTeam', dataFromClient.team, dataFromClient.i)
+        io.to(dataFromClient.user.id).emit('setPersonalTeam', dataFromClient.team)
       }
     )
   })
@@ -122,7 +126,6 @@ io.on("connection", socket => {
   socket.on('startGame', (dataFromClient, cbToClient) =>{
     isGameRun = true
     client.set(`room:${dataFromClient.room}:game-status`, isGameRun, redis.print)
-    let ROUND = 0
     let i=0
     let uniqueIndexForDictionary = []
     while (i<8) {
@@ -187,72 +190,158 @@ io.on("connection", socket => {
   // start round
 
   socket.on('startRound', (dataFromClient, cbToClient) => {
-    client.smembers(`room:${dataFromClient[0].room}:team:white:users`, function (e, keys) {
-      if (e) console.log(e)
-      // переделать чтобы по кругу было
-      let activeIndex = 0
-      client.hgetall(keys[activeIndex], function (e, activeUser){
+
+    if (dataFromClient[1].team === 'white') {
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
+      isWhiteBtnPress = true
+    } else {
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
+      isBlackBtnPress = true
+    }
+    if (isWhiteBtnPress && isBlackBtnPress) {
+      isBlackBtnPress = false
+      isWhiteBtnPress = false
+      io.to(dataFromClient[0][0].room).emit('setActiveTeam', isBlackBtnPress)
+      client.smembers(`room:${dataFromClient[0][0].room}:team:white:users`, function (e, keys) {
         if (e) console.log(e)
-        client.hmset(keys[activeIndex],
-          'id', keys[activeIndex],
-          'name', activeUser.name,
-          'room', activeUser.room,
-          'team', activeUser.team,
-          'players', activeUser.players,
-          'isOrganizer', activeUser.isOrganizer,
-          'isActive', true,
-          function(err, res) {
-            if (err) console.log(err)
-            console.log(res)
-            let multi = client.multi()
-            keys.forEach(whiteUser =>{
-              multi.hgetall(whiteUser)
-            })
-            multi.exec(function(error, whiteUser) {
-              if (error) console.log(error)
-              whiteUser.forEach(whUser =>{
-                if (whUser.isActive === 'true') {
-                  io.to(whUser.id).emit('threeNumbers', getThreeNumbers())
-                }
+        // переделать чтобы по кругу было
+        let activeIndex = 0
+        client.hgetall(keys[activeIndex], function (e, activeUser){
+          if (e) console.log(e)
+          client.hmset(keys[activeIndex],
+            'id', keys[activeIndex],
+            'name', activeUser.name,
+            'room', activeUser.room,
+            'team', activeUser.team,
+            'players', activeUser.players,
+            'isOrganizer', activeUser.isOrganizer,
+            'isActive', true,
+            function(err, res) {
+              if (err) console.log(err)
+              console.log(res)
+              let multi = client.multi()
+              keys.forEach(whiteUser =>{
+                multi.hgetall(whiteUser)
+              })
+              multi.exec(function(error, whiteUser) {
+                if (error) console.log(error)
+                whiteUser.forEach(whUser =>{
+                  if (whUser.isActive === 'true') {
+                    let threeCorrectSecretNumbers = getThreeNumbers()
+                    client.set(
+                      `room:${dataFromClient[0][0].room}:team:white:round:${ROUND}:threeCorrectSecretNumbers`,
+                      JSON.stringify(threeCorrectSecretNumbers))
+                    io.to(whUser.id).emit('threeNumbers', threeCorrectSecretNumbers)
+                  }
+                })
               })
             })
-          })
+        })
       })
-    })
-    client.smembers(`room:${dataFromClient[0].room}:team:black:users`, function (e, keys) {
-      if (e) console.log(e)
-      // переделать чтобы по кругу было
-      let activeIndex = 0
-      client.hgetall(keys[activeIndex], function (e, activeUser){
+      client.smembers(`room:${dataFromClient[0][0].room}:team:black:users`, function (e, keys) {
         if (e) console.log(e)
-        client.hmset(keys[activeIndex],
-          'id', keys[activeIndex],
-          'name', activeUser.name,
-          'room', activeUser.room,
-          'team', activeUser.team,
-          'players', activeUser.players,
-          'isOrganizer', activeUser.isOrganizer,
-          'isActive', true,
-          function(err, res) {
-            if (err) console.log(err)
-            console.log(res)
-            let multi = client.multi()
-            keys.forEach(blackUser =>{
-              multi.hgetall(blackUser)
-            })
-            multi.exec(function(error, blackUsers) {
-              if (error) console.log(error)
-              blackUsers.forEach(blUser =>{
-                if (blUser.isActive === 'true') {
-                  io.to(blUser.id).emit('threeNumbers', getThreeNumbers())
-                }
+        // переделать чтобы по кругу было
+        let activeIndex = 0
+        client.hgetall(keys[activeIndex], function (e, activeUser){
+          if (e) console.log(e)
+          client.hmset(keys[activeIndex],
+            'id', keys[activeIndex],
+            'name', activeUser.name,
+            'room', activeUser.room,
+            'team', activeUser.team,
+            'players', activeUser.players,
+            'isOrganizer', activeUser.isOrganizer,
+            'isActive', true,
+            function(err, res) {
+              if (err) console.log(err)
+              console.log(res)
+              let multi = client.multi()
+              keys.forEach(blackUser =>{
+                multi.hgetall(blackUser)
+              })
+              multi.exec(function(error, blackUsers) {
+                if (error) console.log(error)
+                blackUsers.forEach(blUser =>{
+                  if (blUser.isActive === 'true') {
+                    let threeCorrectSecretNumbers = getThreeNumbers()
+                    client.set(
+                      `room:${dataFromClient[0][0].room}:team:black:round:${ROUND}:threeCorrectSecretNumbers`,
+                      JSON.stringify(threeCorrectSecretNumbers))
+                    io.to(blUser.id).emit('threeNumbers', threeCorrectSecretNumbers)
+                  }
+                })
               })
             })
-          })
+        })
       })
-    })
+      cbToClient()
+      io.to(dataFromClient[0][0].room).emit('messageToNotActive' ,'Wait please! Active players write a words =)')
+    } else {
+      if (isWhiteBtnPress) {
+        io.to(`${dataFromClient[0][0].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
+        cbToClient()
+      } else {
+        io.to(`${dataFromClient[0][0].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
+        cbToClient()
+      }
+    }
+  })
+
+  // readyThreeWords
+
+  socket.on('readyThreeWords', (dataFromClient, cbToClient) => {
+    if (dataFromClient[1].team === 'white') {
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
+      client.zadd(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:association`,
+        1, dataFromClient[0][0],
+        2, dataFromClient[0][1],
+        3, dataFromClient[0][2])
+      isWhiteBtnPress = true
+    } else {
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
+      client.zadd(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:association`,
+        1, dataFromClient[0][0],
+        2, dataFromClient[0][1],
+        3, dataFromClient[0][2])
+      isBlackBtnPress = true
+    }
+    if (isWhiteBtnPress && isBlackBtnPress) {
+      isBlackBtnPress = false
+      isWhiteBtnPress = false
+      io.to(dataFromClient[1].room).emit('setActiveTeam', isBlackBtnPress)
+
+      client.zrange(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:association`, 0, -1, function (e, res) {
+        if (e) console.log(e)
+        console.log('res zrange')
+        console.log(res)
+        io.to(dataFromClient[1].room).emit('setThreeWhiteWords', res)
+      })
+
+    } else {
+      if (isWhiteBtnPress) {
+        io.to(`${dataFromClient[1].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
+        cbToClient()
+      } else {
+        io.to(`${dataFromClient[1].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
+        cbToClient()
+      }
+    }
+  })
+
+  // end readyThreeWords
+
+  socket.on('changeNumberOne', (dataFromClient, cbToClient) => {
     cbToClient()
-    io.to(dataFromClient[0].room).emit('messageToNotActive' ,'Wait please! Active players write a words =)')
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberOne', dataFromClient[0])
+  })
+
+  socket.on('changeNumberTwo', (dataFromClient, cbToClient) => {
+    cbToClient()
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberTwo', dataFromClient[0])
+  })
+  socket.on('changeNumberThree', (dataFromClient, cbToClient) => {
+    cbToClient()
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberThree', dataFromClient[0])
   })
 
   // end round
