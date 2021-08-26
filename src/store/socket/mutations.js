@@ -48,6 +48,14 @@ export function  SOCKET_setThreeWhiteWords (state, data) {
   state.step = 2
 }
 
+export function  SOCKET_middleRoundResult (state, data) {
+  console.log('SOCKET_middleRoundResult')
+  console.log(data)
+  state.isTryBlackToGuessCorrect = data[0]
+  state.isTryWhiteToGuessCorrect = data[1]
+  state.step = 3
+}
+
 export function  SOCKET_setActiveTeam (state, data) {
   console.log('SOCKET_setActiveTeam')
   state.isTeamReady = data[0]

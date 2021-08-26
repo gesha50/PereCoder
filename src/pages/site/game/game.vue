@@ -23,25 +23,29 @@
             class="q-gutter-md"
           >
             <q-input
+              :disable="isBtnActive"
               filled
               v-model="firstWord"
               label="first association"
               hint="use secret code numbers!!!"
             />
             <q-input
+              :disable="isBtnActive"
               filled
               v-model="secondWord"
               label="second association"
             />
             <q-input
+              :disable="isBtnActive"
               filled
               v-model="thirdWord"
               label="third association"
             />
 
             <div>
-              <q-btn label="Submit" type="submit" color="primary"/>
-              <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+              <q-btn :disable="isBtnActive" label="Submit" type="submit" color="primary"/>
+              <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+              <p v-if="isBtnActive">{{gameMessage}}</p>
             </div>
           </q-form>
 
@@ -65,6 +69,7 @@
         class="q-gutter-md"
       >
         <q-input
+          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
           @input="updateValue1($event)"
           class="inline-block"
           filled
@@ -73,6 +78,7 @@
           :value="firstNumber"
         />
         <q-input
+          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
           @input="updateValue2($event)"
           class="inline-block"
           filled
@@ -81,6 +87,7 @@
           :value="secondNumber"
         />
         <q-input
+          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
           @input="updateValue3($event)"
           class="inline-block"
           filled
@@ -89,12 +96,34 @@
           :value="thirdNumber"
         />
         <div>
-          <q-btn label="Submit" type="submit" color="primary"/>
-          <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+          <q-btn
+            :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
+            label="Submit" type="submit" color="primary"/>
+          <q-btn
+            :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
+            label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+          <p v-if="isBtnActive">{{gameMessage}}</p>
         </div>
       </q-form>
     </div>
-
+    <div v-else-if="step === 3">
+      <div>
+        <p>White team:</p>
+        <p v-if="isTryWhiteToGuessCorrect === 'true'"> correct </p>
+        <p v-else> mistake!!! </p>
+      </div>
+      <div>
+        <p>Black team:</p>
+        <p v-if="isTryBlackToGuessCorrect  === 'true'"> Bravo correct !! </p>
+        <p v-else> mistake </p>
+      </div>
+    </div>
+    <div v-else-if="step === 4">
+      like step 2
+    </div>
+    <div v-else-if="step === 5">
+      like step 3
+    </div>
   </q-page>
 </template>
 
@@ -120,6 +149,12 @@ export default {
         return true
       }
       return false
+    },
+    isTryWhiteToGuessCorrect () {
+      return this.$store.getters["socket/isTryWhiteToGuessCorrect"]
+    },
+    isTryBlackToGuessCorrect () {
+      return this.$store.getters["socket/isTryBlackToGuessCorrect"]
     },
     firstNumber () {
       return this.$store.getters["socket/firstNumber"]
@@ -183,7 +218,7 @@ export default {
     },
     sendTryToGuessSecretCode() {
       this.$socket.emit('tryToGuessSecretCode',
-        [[this.firstNumber,this.secondNumber,this.thirdNumber], this.currentUser],
+        [[Number(this.firstNumber),Number(this.secondNumber),Number(this.thirdNumber)], this.currentUser],
         dataFromServer => {
           console.log(dataFromServer)
         })

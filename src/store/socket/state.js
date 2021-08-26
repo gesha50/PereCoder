@@ -14,5 +14,7 @@ export default function () {
     firstNumber: null,
     secondNumber: null,
     thirdNumber: null,
+    isTryBlackToGuessCorrect: false,
+    isTryWhiteToGuessCorrect: false,
   }
 }

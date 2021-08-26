@@ -49,3 +49,12 @@ export function thirdNumber (state) {
   return state.thirdNumber
 }
 
+export function isTryWhiteToGuessCorrect (state) {
+  return state.isTryWhiteToGuessCorrect
+}
+
+export function isTryBlackToGuessCorrect (state) {
+  return state.isTryBlackToGuessCorrect
+}
+
+
