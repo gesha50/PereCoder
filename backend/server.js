@@ -22,6 +22,12 @@ let isGameRun = false
 let isWhiteBtnPress = false
 let isBlackBtnPress = false
 let ROUND = 0
+let isTryBlackToGuessCorrect
+let isTryWhiteToGuessCorrect
+let blackCounterHindrance = 0
+let blackCounterInterception = 0
+let whiteCounterHindrance = 0
+let whiteCounterInterception = 0
 
 app.use(cors());
 const io = new Server(server, {
@@ -125,6 +131,8 @@ io.on("connection", socket => {
 
   socket.on('startGame', (dataFromClient, cbToClient) =>{
     isGameRun = true
+    ROUND++
+    client.set(`room:${dataFromClient.room}:roundNumber`, ROUND)
     client.set(`room:${dataFromClient.room}:game-status`, isGameRun, redis.print)
     let i=0
     let uniqueIndexForDictionary = []
@@ -152,7 +160,7 @@ io.on("connection", socket => {
     client.set('FOUR_WORDS_WHITE', JSON.stringify(FOUR_WORDS_WHITE), redis.print)
     client.set('FOUR_WORDS_BLACK', JSON.stringify(FOUR_WORDS_BLACK), redis.print)
 
-    io.to(dataFromClient.room).emit('setGameStatus', isGameRun)
+    io.to(dataFromClient.room).emit('setGameStatus', isGameRun, ROUND)
     cbToClient('ok')
   })
 
@@ -191,6 +199,8 @@ io.on("connection", socket => {
 
   socket.on('startRound', (dataFromClient, cbToClient) => {
 
+    console.log(ROUND)
+
     if (dataFromClient[1].team === 'white') {
       // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
       isWhiteBtnPress = true
@@ -204,8 +214,13 @@ io.on("connection", socket => {
       io.to(dataFromClient[0][0].room).emit('setActiveTeam', isBlackBtnPress)
       client.smembers(`room:${dataFromClient[0][0].room}:team:white:users`, function (e, keys) {
         if (e) console.log(e)
-        // переделать чтобы по кругу было
         let activeIndex = 0
+        if (ROUND !== 0) {
+          activeIndex++
+          if (activeIndex > keys.length-1) {
+            activeIndex = 0
+          }
+        }
         client.hgetall(keys[activeIndex], function (e, activeUser){
           if (e) console.log(e)
           client.hmset(keys[activeIndex],
@@ -240,8 +255,14 @@ io.on("connection", socket => {
       })
       client.smembers(`room:${dataFromClient[0][0].room}:team:black:users`, function (e, keys) {
         if (e) console.log(e)
-        // переделать чтобы по кругу было
+
         let activeIndex = 0
+        if (ROUND !== 0) {
+          activeIndex++
+          if (activeIndex > keys.length-1) {
+            activeIndex = 0
+          }
+        }
         client.hgetall(keys[activeIndex], function (e, activeUser){
           if (e) console.log(e)
           client.hmset(keys[activeIndex],
@@ -328,18 +349,25 @@ io.on("connection", socket => {
 
   socket.on('changeNumberOne', (dataFromClient, cbToClient) => {
     cbToClient()
-    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberOne', dataFromClient[0])
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`)
+      .emit('changeNumberOne', dataFromClient[0],dataFromClient[1].team)
   })
-
   socket.on('changeNumberTwo', (dataFromClient, cbToClient) => {
     cbToClient()
-    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberTwo', dataFromClient[0])
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`)
+      .emit('changeNumberTwo', dataFromClient[0],dataFromClient[1].team)
   })
   socket.on('changeNumberThree', (dataFromClient, cbToClient) => {
     cbToClient()
-    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`).emit('changeNumberThree', dataFromClient[0])
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`)
+      .emit('changeNumberThree', dataFromClient[0],dataFromClient[1].team)
   })
 
+  socket.on('nullNumbers', (dataFromClient, cbToClient) => {
+    cbToClient()
+    io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`)
+      .emit('nullNumbers', dataFromClient[0])
+  })
   // tryToGuessSecretCode
 
   socket.on('tryToGuessSecretCode', (dataFromClient, cbToClient) => {
@@ -352,23 +380,50 @@ io.on("connection", socket => {
           client.set(
             `room:${dataFromClient[1].room}:team:white:round:${ROUND}:threeTryToGuessNumbers`,
             dataFromClient[0])
-          let isTryWhiteToGuessCorrect = threeCorrectSecretNumbers === dataFromClient[0];
+          if (threeCorrectSecretNumbers === dataFromClient[0]) {
+            isTryWhiteToGuessCorrect = true
+          } else  {
+            isTryWhiteToGuessCorrect = false
+            whiteCounterHindrance++
+          }
           client.set(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, isTryWhiteToGuessCorrect)
+          client.set(`room:${dataFromClient[1].room}:team:white:whiteCounterHindrance`, whiteCounterHindrance)
         } else {
           // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
           isBlackBtnPress = true
           client.set(
             `room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeTryToGuessNumbers`,
             dataFromClient[0])
-          let isTryBlackToGuessCorrect = threeCorrectSecretNumbers === dataFromClient[0];
+          if (threeCorrectSecretNumbers === dataFromClient[0]) {
+            isTryBlackToGuessCorrect = true
+            blackCounterInterception++
+          } else {
+            isTryBlackToGuessCorrect = false
+          }
           client.set(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, isTryBlackToGuessCorrect)
+          client.set(`room:${dataFromClient[1].room}:team:black:blackCounterInterception`, blackCounterInterception)
         }
         if (isWhiteBtnPress && isBlackBtnPress) {
+          isBlackBtnPress = false
+          isWhiteBtnPress = false
+          io.to(dataFromClient[1].room).emit('setActiveTeam', isBlackBtnPress)
           client.get(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, function (e, white){
             if (e) console.log(e)
             client.get(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, function (e, black){
               if (e) console.log(e)
-              io.to(dataFromClient[1].room).emit('middleRoundResult', black, white)
+              client.get(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:threeTryToGuessNumbers`,
+                function (e, whiteThreeTryToGuessNumbers){
+                  if (e) console.log(e)
+                  client.get(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeTryToGuessNumbers`,
+                    function (e, blackThreeTryToGuessNumbers){
+                      if (e) console.log(e)
+                      io.to(dataFromClient[1].room)
+                        .emit('middleRoundResult', black, white,
+                          blackCounterInterception, whiteCounterHindrance,
+                          threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
+                          blackThreeTryToGuessNumbers)
+                    })
+                })
             })
           })
         } else {
@@ -385,6 +440,123 @@ io.on("connection", socket => {
 
   // end tryToGuessSecretCode
 
+  // three word black team
+
+  socket.on('nextThreeWords', (dataFromClient, cbToClient) => {
+    if (dataFromClient.team === 'white') {
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
+      isWhiteBtnPress = true
+    } else {
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
+      isBlackBtnPress = true
+    }
+    if (isWhiteBtnPress && isBlackBtnPress) {
+      isBlackBtnPress = false
+      isWhiteBtnPress = false
+      io.to(dataFromClient.room).emit('setActiveTeam', isBlackBtnPress)
+
+      client.zrange(`room:${dataFromClient.room}:team:black:round:${ROUND}:association`, 0, -1, function (e, res) {
+        if (e) console.log(e)
+        io.to(dataFromClient.room).emit('setThreeBlackWords', res)
+      })
+    } else {
+      if (isWhiteBtnPress) {
+        io.to(`${dataFromClient.room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
+        cbToClient()
+      } else {
+        io.to(`${dataFromClient.room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
+        cbToClient()
+      }
+    }
+  })
+
+  //end three word black team
+
+  // Try To Guess Secret Code team black
+
+  socket.on('nextTryToGuessSecretCode', (dataFromClient, cbToClient) => {
+    dataFromClient[0] = JSON.stringify(dataFromClient[0])
+    client.get(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeCorrectSecretNumbers`,
+      function (e, threeCorrectSecretNumbers) {
+        if (dataFromClient[1].team === 'white') {
+          // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
+          isWhiteBtnPress = true
+          client.set(
+            `room:${dataFromClient[1].room}:team:white:round:${ROUND}:tryToGuessBlackNumbers`,
+            dataFromClient[0])
+          if (threeCorrectSecretNumbers === dataFromClient[0]) {
+            isTryWhiteToGuessCorrect = true
+            whiteCounterInterception++
+          } else  {
+            isTryWhiteToGuessCorrect = false
+          }
+          client.set(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, isTryWhiteToGuessCorrect)
+          client.set(`room:${dataFromClient[1].room}:team:white:whiteCounterInterception`, whiteCounterInterception)
+        } else {
+          // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
+          isBlackBtnPress = true
+          client.set(
+            `room:${dataFromClient[1].room}:team:black:round:${ROUND}:tryToGuessBlackNumbers`,
+            dataFromClient[0])
+          if (threeCorrectSecretNumbers === dataFromClient[0]) {
+            isTryBlackToGuessCorrect = true
+          } else {
+            isTryBlackToGuessCorrect = false
+            blackCounterHindrance++
+          }
+          client.set(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, isTryBlackToGuessCorrect)
+          client.set(`room:${dataFromClient[1].room}:team:black:blackCounterHindrance`, blackCounterHindrance)
+        }
+        if (isWhiteBtnPress && isBlackBtnPress) {
+          isBlackBtnPress = false
+          isWhiteBtnPress = false
+          io.to(dataFromClient[1].room).emit('setActiveTeam', isBlackBtnPress)
+          client.get(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, function (e, white){
+            if (e) console.log(e)
+            client.get(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, function (e, black){
+              if (e) console.log(e)
+              client.get(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:tryToGuessBlackNumbers`,
+                function (e, whiteThreeTryToGuessNumbers){
+                  if (e) console.log(e)
+                  client.get(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:tryToGuessBlackNumbers`,
+                    function (e, blackThreeTryToGuessNumbers){
+                      if (e) console.log(e)
+                      io.to(dataFromClient[1].room)
+                        .emit('finishRoundResult', black, white,
+                          blackCounterHindrance, whiteCounterInterception,
+                          threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
+                          blackThreeTryToGuessNumbers)
+                    })
+                })
+            })
+          })
+        } else {
+          if (isWhiteBtnPress) {
+            io.to(`${dataFromClient[1].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
+            cbToClient()
+          } else {
+            io.to(`${dataFromClient[1].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
+            cbToClient()
+          }
+        }
+      })
+  })
+
+  //end
+
+  // finish Round
+
+  socket.on('finishRound', (dataFromClient, cbToClient) => {
+    ROUND++
+    client.set(`room:${dataFromClient.room}:roundNumber`, ROUND)
+    cbToClient()
+    console.log(dataFromClient)
+
+    // исправить!!! 2 раза срабатывает!
+  })
+
+  // end finish Round
+
   // end round
 
   socket.on('disconnecting', () => {
@@ -396,5 +568,5 @@ io.on("connection", socket => {
   })
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT);

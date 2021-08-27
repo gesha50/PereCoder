@@ -1,8 +1,53 @@
 <template>
   <q-page padding>
-    <h4>Страница игры!</h4>
-    <div>Your team: {{currentUser.team}}</div>
+    <div>Your team: {{currentUser.team}}  Round # {{roundNumber}}
+      <div v-if="currentUser.team === 'white'">
+        <div>
+          <div v-if="whiteCounterHindrance===1">
+            <p class="bg-dark">x</p>
+          </div>
+          <div v-else-if="whiteCounterHindrance===2">
+            <p class="bg-dark">x</p>
+            <p class="bg-dark">x</p>
+          </div>
+          <div v-else></div>
+        </div>
+        <div>
+          <div v-if="whiteCounterInterception===1">
+            <p class="bg-yellow-1">v</p>
+          </div>
+          <div v-if="whiteCounterInterception===2">
+            <p class="bg-yellow-1">v</p>
+            <p class="bg-yellow-1">v</p>
+          </div>
+          <div v-else></div>
+        </div>
+      </div>
+      <div v-else>
+        <div>
+          <div v-if="blackCounterHindrance===1">
+            <p class="bg-dark">x</p>
+          </div>
+          <div v-else-if="blackCounterHindrance===2">
+            <p class="bg-dark">x</p>
+            <p class="bg-dark">x</p>
+          </div>
+          <div v-else></div>
+        </div>
+        <div>
+          <div v-if="blackCounterInterception===1">
+            <p class="bg-yellow-1">v</p>
+          </div>
+          <div v-if="blackCounterInterception===2">
+            <p class="bg-yellow-1">v</p>
+            <p class="bg-yellow-1">v</p>
+          </div>
+          <div v-else></div>
+        </div>
+      </div>
+    </div>
     <p
+      class="inline-block q-mx-lg text-subtitle1 text-weight-bold"
       v-for="(word, i) in this.$store.getters['socket/FOUR_GAME_WORDS']"
       :key="i"
     >{{word}}</p>
@@ -65,36 +110,67 @@
       <pre class="inline-block" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc+' | '}}</pre>
       <q-form
         @submit="sendTryToGuessSecretCode"
-        @reset="onReset2"
+        @reset="onReset2(currentUser.team)"
         class="q-gutter-md"
       >
-        <q-input
-          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
-          @input="updateValue1($event)"
-          class="inline-block"
-          filled
-          style="max-width: 70px"
-          type="number"
-          :value="firstNumber"
-        />
-        <q-input
-          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
-          @input="updateValue2($event)"
-          class="inline-block"
-          filled
-          style="max-width: 70px"
-          type="number"
-          :value="secondNumber"
-        />
-        <q-input
-          :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
-          @input="updateValue3($event)"
-          class="inline-block"
-          filled
-          style="max-width: 70px"
-          type="number"
-          :value="thirdNumber"
-        />
+        <div class="q-gutter-md" v-if="currentUser.team === 'white'">
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue1($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="firstNumberWhite"
+          />
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue2($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="secondNumberWhite"
+          />
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue3($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="thirdNumberWhite"
+          />
+        </div>
+        <div class="q-gutter-md" v-else>
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue1($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="firstNumberBlack"
+          />
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue2($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="secondNumberBlack"
+          />
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue3($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="thirdNumberBlack"
+          />
+        </div>
         <div>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
@@ -107,22 +183,154 @@
       </q-form>
     </div>
     <div v-else-if="step === 3">
-      <div>
-        <p>White team:</p>
-        <p v-if="isTryWhiteToGuessCorrect === 'true'"> correct </p>
-        <p v-else> mistake!!! </p>
-      </div>
-      <div>
-        <p>Black team:</p>
-        <p v-if="isTryBlackToGuessCorrect  === 'true'"> Bravo correct !! </p>
-        <p v-else> mistake </p>
-      </div>
+     <div class="bg-secondary">
+       <div>
+         <div>White team try this secret code:
+           <p   >{{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}</p>
+         </div>
+         <p v-if="isTryWhiteToGuessCorrect === 'true'"> correct! no counter for White team </p>
+         <div v-else> mistake!!!  your get counter hindrance <div class="bg-dark">x</div></div>
+       </div>
+       <div>
+         <div>Black team try this secret code:
+           <p   >{{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}</p>
+         </div>
+         <div v-if="isTryBlackToGuessCorrect  === 'true'">
+           Bravo correct !! your get counter interception!
+           <div class="bg-yellow-1">v</div>
+         </div>
+         <p v-else> mistake! no counter for Black team </p>
+       </div>
+       <div class="bg-red text-weight-bold text-h6">
+         correct secret code team white:
+         {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+       </div>
+     </div>
+      <q-btn
+        @click="nextThreeWords"
+        :disable="isBtnActive"
+        label="Next"
+        color="primary"
+      />
+      <p v-if="isBtnActive">{{gameMessage}}</p>
     </div>
-    <div v-else-if="step === 4">
-      like step 2
+    <div v-else-if="step === 4" class="bg-orange">
+      <div class="flex justify-between">
+        <div>Black team association:</div>
+        <div v-if="currentUser.team === 'black'"> It`s your team association! You should to guess this! </div>
+        <div v-else>If you guess this It`s very cool!!!</div>
+      </div>
+      <pre class="inline-block" v-for="(assoc, i) in threeBlackAssociation" :key="i">{{assoc+' | '}}</pre>
+      <q-form
+        @submit="sendTryToGuessSecretCode2"
+        @reset="onReset2(currentUser.team)"
+        class="q-gutter-md"
+      >
+        <div class="q-gutter-md" v-if="currentUser.team === 'white'">
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue1($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="firstNumberWhite"
+          />
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue2($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="secondNumberWhite"
+          />
+          <q-input
+            :disable="isBtnActive"
+            @input="updateValue3($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="thirdNumberWhite"
+          />
+        </div>
+        <div class="q-gutter-md" v-else>
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue1($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="firstNumberBlack"
+          />
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue2($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="secondNumberBlack"
+          />
+          <q-input
+            :disable="currentUser.isActive || isBtnActive"
+            @input="updateValue3($event)"
+            class="inline-block"
+            filled
+            style="max-width: 70px"
+            type="number"
+            :value="thirdNumberBlack"
+          />
+        </div>
+        <div>
+          <q-btn
+            :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive"
+            label="Submit" type="submit" color="primary"/>
+          <q-btn
+            :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive"
+            label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+          <p v-if="isBtnActive">{{gameMessage}}</p>
+        </div>
+      </q-form>
     </div>
     <div v-else-if="step === 5">
-      like step 3
+      <div class="bg-secondary">
+        <div>
+          <div>White team try this secret code:
+            <p   >{{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}</p>
+          </div>
+          <div v-if="isTryWhiteToGuessCorrect === 'true'">
+            Bravo correct !! your get counter interception!
+          <div class="bg-yellow-1">v</div>
+          </div>
+          <div v-else> mistake! no counter for WHITE team </div>
+        </div>
+        <div>
+          <div>Black team try this secret code:
+            <p>{{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}</p>
+          </div>
+          <div v-if="isTryBlackToGuessCorrect  === 'true'">
+            Correct! no counter for White team
+          </div>
+          <div v-else>
+            mistake!!!  your get counter hindrance
+            <div class="bg-dark">x</div>
+          </div>
+        </div>
+        <div class="bg-red text-weight-bold text-h6">
+          correct secret code team white:
+          {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+        </div>
+      </div>
+      <q-btn
+        @click="finishRoundAndNext"
+        :disable="isBtnActive"
+        label="Next Round"
+        color="primary"
+      />
+      <p v-if="isBtnActive">{{gameMessage}}</p>
     </div>
   </q-page>
 </template>
@@ -150,20 +358,50 @@ export default {
       }
       return false
     },
+    blackCounterHindrance () {
+      return this.$store.getters["socket/blackCounterHindrance"]
+    },
+    blackCounterInterception () {
+      return this.$store.getters["socket/blackCounterInterception"]
+    },
+    whiteCounterHindrance () {
+      return this.$store.getters["socket/whiteCounterHindrance"]
+    },
+    whiteCounterInterception () {
+      return this.$store.getters["socket/whiteCounterInterception"]
+    },
     isTryWhiteToGuessCorrect () {
       return this.$store.getters["socket/isTryWhiteToGuessCorrect"]
     },
     isTryBlackToGuessCorrect () {
       return this.$store.getters["socket/isTryBlackToGuessCorrect"]
     },
-    firstNumber () {
-      return this.$store.getters["socket/firstNumber"]
+    firstNumberWhite () {
+      return this.$store.getters["socket/firstNumberWhite"]
     },
-    secondNumber () {
-      return this.$store.getters["socket/secondNumber"]
+    secondNumberWhite () {
+      return this.$store.getters["socket/secondNumberWhite"]
     },
-    thirdNumber () {
-      return this.$store.getters["socket/thirdNumber"]
+    thirdNumberWhite () {
+      return this.$store.getters["socket/thirdNumberWhite"]
+    },
+    firstNumberBlack () {
+      return this.$store.getters["socket/firstNumberBlack"]
+    },
+    secondNumberBlack () {
+      return this.$store.getters["socket/secondNumberBlack"]
+    },
+    thirdNumberBlack () {
+      return this.$store.getters["socket/thirdNumberBlack"]
+    },
+    correctFirstNumber () {
+      return this.$store.getters["socket/correctFirstNumber"]
+    },
+    correctSecondNumber () {
+      return this.$store.getters["socket/correctSecondNumber"]
+    },
+    correctThirdNumber () {
+      return this.$store.getters["socket/correctThirdNumber"]
     },
     threeWhiteAssociation () {
       return this.$store.getters["socket/threeWhiteAssociation"]
@@ -187,7 +425,7 @@ export default {
       return this.$store.getters["socket/user"]
     },
     roundNumber() {
-      return 1
+      return this.$store.getters["socket/round"]
     },
     allUsers() {
       return this.$store.getters["socket/users"]
@@ -211,20 +449,51 @@ export default {
           console.log(dataFromServer)
         })
     },
+    nextThreeWords () {
+      this.onReset2('all')
+      this.$socket.emit('nextThreeWords', this.currentUser,
+        dataFromServer => {
+          console.log(dataFromServer)
+        })
+    },
     onReset () {
       this.firstWord = null
       this.secondWord = null
       this.thirdWord = null
     },
+    sendTryToGuessSecretCode2() {
+      let arr = []
+      if (this.currentUser.team === 'black') {
+        arr = [Number(this.firstNumberBlack),Number(this.secondNumberBlack),Number(this.thirdNumberBlack)]
+      } else {
+        arr = [Number(this.firstNumberWhite),Number(this.secondNumberWhite),Number(this.thirdNumberWhite)]
+      }
+      this.$socket.emit('nextTryToGuessSecretCode',
+        [arr, this.currentUser],
+        dataFromServer => {
+          console.log(dataFromServer)
+        })
+
+    },
+
     sendTryToGuessSecretCode() {
+      let arr = []
+      if (this.currentUser.team === 'white') {
+        arr = [Number(this.firstNumberWhite),Number(this.secondNumberWhite),Number(this.thirdNumberWhite)]
+      } else {
+        arr = [Number(this.firstNumberBlack),Number(this.secondNumberBlack),Number(this.thirdNumberBlack)]
+      }
       this.$socket.emit('tryToGuessSecretCode',
-        [[Number(this.firstNumber),Number(this.secondNumber),Number(this.thirdNumber)], this.currentUser],
+        [arr, this.currentUser],
         dataFromServer => {
           console.log(dataFromServer)
         })
     },
-    onReset2 () {
-      this.$store.dispatch('socket/resetNumbers')
+    onReset2 (team) {
+      this.$socket.emit('nullNumbers', [team, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+      })
+      // this.$store.dispatch('socket/resetNumbers', team)
     },
     updateValue1(val) {
       this.$socket.emit('changeNumberOne', [val, this.currentUser], dataFromServer => {
@@ -238,6 +507,15 @@ export default {
     },
     updateValue3(val) {
       this.$socket.emit('changeNumberThree', [val, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+      })
+    },
+    finishRoundAndNext () {
+      this.onReset2('all')
+      this.$socket.emit('finishRound',  this.currentUser, dataFromServer => {
+        console.log(dataFromServer)
+      })
+      this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
       })
     },

@@ -1,9 +1,6 @@
 <template>
   <q-footer class="footer bg-white text-grey-9">
     <div style="max-width: 300px; margin: 20px auto">
-      <div class="text-center footer__text">
-        {{$t('footer.text')}}
-      </div>
       <div class="q-mt-sm row justify-around">
         <a href="tel:+79175433952">
           <custom-icon

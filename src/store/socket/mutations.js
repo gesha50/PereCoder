@@ -19,7 +19,8 @@ export function SOCKET_updateUsers (state, data) {
 }
 
 export function SOCKET_setGameStatus (state, data) {
-  state.isGameRun = data
+  state.isGameRun = data[0]
+  state.ROUND = data[1]
 }
 
 export function  SOCKET_setTeam (state, data) {
@@ -48,12 +49,65 @@ export function  SOCKET_setThreeWhiteWords (state, data) {
   state.step = 2
 }
 
+export function  SOCKET_setThreeBlackWords (state, data) {
+  console.log('SOCKET_setThreeBlackWords')
+  state.threeBlackAssociation = data
+  state.step = 4
+}
+
 export function  SOCKET_middleRoundResult (state, data) {
   console.log('SOCKET_middleRoundResult')
   console.log(data)
   state.isTryBlackToGuessCorrect = data[0]
   state.isTryWhiteToGuessCorrect = data[1]
+  state.blackCounterInterception = data[2]
+  state.whiteCounterHindrance = data[3]
+
+  let correctArr = JSON.parse(data[4])
+  state.correctFirstNumber = correctArr[0]
+  state.correctSecondNumber = correctArr[1]
+  state.correctThirdNumber = correctArr[2]
+
+  let whiteArr = JSON.parse(data[5])
+
+  state.firstNumberWhite = whiteArr[0]
+  state.secondNumberWhite = whiteArr[1]
+  state.thirdNumberWhite = whiteArr[2]
+
+  let blackArr = JSON.parse(data[6])
+  state.firstNumberBlack = blackArr[0]
+  state.secondNumberBlack = blackArr[1]
+  state.thirdNumberBlack = blackArr[2]
+
   state.step = 3
+}
+
+export function SOCKET_finishRoundResult (state, data) {
+  console.log('SOCKET_finishRoundResult')
+  console.log(data)
+
+  state.isTryBlackToGuessCorrect = data[0]
+  state.isTryWhiteToGuessCorrect = data[1]
+  state.blackCounterHindrance = data[2]
+  state.whiteCounterInterception = data[3]
+
+  let correctArr = JSON.parse(data[4])
+  state.correctFirstNumber = correctArr[0]
+  state.correctSecondNumber = correctArr[1]
+  state.correctThirdNumber = correctArr[2]
+
+  let whiteArr = JSON.parse(data[5])
+
+  state.firstNumberWhite = whiteArr[0]
+  state.secondNumberWhite = whiteArr[1]
+  state.thirdNumberWhite = whiteArr[2]
+
+  let blackArr = JSON.parse(data[6])
+  state.firstNumberBlack = blackArr[0]
+  state.secondNumberBlack = blackArr[1]
+  state.thirdNumberBlack = blackArr[2]
+
+  state.step = 5
 }
 
 export function  SOCKET_setActiveTeam (state, data) {
@@ -78,21 +132,49 @@ export function setUserTeam (state, obj) {
 
 export function  SOCKET_changeNumberOne (state, data) {
   console.log('SOCKET_changeNumberOne')
-  state.firstNumber = data
+  if (data[1] === 'white') {
+    state.firstNumberWhite = data[0]
+  } else {
+    state.firstNumberBlack = data[0]
+  }
 }
 
 export function  SOCKET_changeNumberTwo (state, data) {
   console.log('SOCKET_changeNumberTwo')
-  state.secondNumber = data
+  if (data[1] === 'white') {
+    state.secondNumberWhite = data[0]
+  } else {
+    state.secondNumberBlack = data[0]
+  }
 }
 
 export function  SOCKET_changeNumberThree (state, data) {
   console.log('SOCKET_changeNumberThree')
-  state.thirdNumber = data
+  if (data[1] === 'white') {
+    state.thirdNumberWhite = data[0]
+  } else {
+    state.thirdNumberBlack = data[0]
+  }
 }
 
-export function resetNumbers (state) {
-  state.firstNumber = null
-  state.secondNumber = null
-  state.thirdNumber = null
+export function SOCKET_nullNumbers (state, team) {
+  if (team === 'white') {
+    state.firstNumberWhite = null
+    state.secondNumberWhite = null
+    state.thirdNumberWhite = null
+  } else if (team === 'black') {
+    state.firstNumberBlack = null
+    state.secondNumberBlack = null
+    state.thirdNumberBlack = null
+  } else {
+    state.firstNumberWhite = null
+    state.secondNumberWhite = null
+    state.thirdNumberWhite = null
+    state.firstNumberBlack = null
+    state.secondNumberBlack = null
+    state.thirdNumberBlack = null
+
+    state.threeWhiteAssociation = null
+    state.threeBlackAssociation = null
+  }
 }

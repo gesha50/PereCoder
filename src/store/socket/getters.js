@@ -1,4 +1,8 @@
 
+export function round (state) {
+  return state.ROUND
+}
+
 export function user (state) {
   return state.user
 }
@@ -39,14 +43,14 @@ export function threeBlackAssociation (state) {
   return state.threeBlackAssociation
 }
 
-export function firstNumber (state) {
-  return state.firstNumber
+export function firstNumberWhite (state) {
+  return state.firstNumberWhite
 }
-export function secondNumber (state) {
-  return state.secondNumber
+export function secondNumberWhite (state) {
+  return state.secondNumberWhite
 }
-export function thirdNumber (state) {
-  return state.thirdNumber
+export function thirdNumberWhite (state) {
+  return state.thirdNumberWhite
 }
 
 export function isTryWhiteToGuessCorrect (state) {
@@ -55,6 +59,46 @@ export function isTryWhiteToGuessCorrect (state) {
 
 export function isTryBlackToGuessCorrect (state) {
   return state.isTryBlackToGuessCorrect
+}
+
+export function blackCounterHindrance (state) {
+  return state.blackCounterHindrance
+}
+
+export function blackCounterInterception (state) {
+  return state.blackCounterInterception
+}
+
+export function whiteCounterHindrance (state) {
+  return state.whiteCounterHindrance
+}
+
+export function whiteCounterInterception (state) {
+  return state.whiteCounterInterception
+}
+
+export function firstNumberBlack (state) {
+  return state.firstNumberBlack
+}
+
+export function secondNumberBlack (state) {
+  return state.secondNumberBlack
+}
+
+export function thirdNumberBlack (state) {
+  return state.thirdNumberBlack
+}
+
+export function correctFirstNumber (state) {
+  return state.correctFirstNumber
+}
+
+export function correctSecondNumber (state) {
+  return state.correctSecondNumber
+}
+
+export function correctThirdNumber (state) {
+  return state.correctThirdNumber
 }
 
 
