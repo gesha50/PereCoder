@@ -1,6 +1,7 @@
 <template>
   <q-page padding>
-    <div>Your team: {{currentUser.team}}  Round # {{roundNumber}}
+    <div>Your team: {{currentUser.team}}
+      <div v-if="step > 0" >Round # {{roundNumber}}</div>
       <div v-if="currentUser.team === 'white'">
         <div>
           <div v-if="whiteCounterHindrance===1">
@@ -52,7 +53,7 @@
       :key="i"
     >{{word}}</p>
     <div v-if="step === 0">
-        <q-btn :disable="isBtnActive" color="orange" :label="'Start ' + roundNumber + ' Round'" @click="startRound" />
+        <q-btn :disable="isBtnActive" color="orange" :label="'Start ' + (roundNumber+1) + ' Round'" @click="startRound" />
       {{gameMessage}}
     </div>
     <div v-else-if="step === 1">
@@ -325,7 +326,7 @@
         </div>
       </div>
       <q-btn
-        @click="finishRoundAndNext"
+        @click="startRound"
         :disable="isBtnActive"
         label="Next Round"
         color="primary"
@@ -349,7 +350,6 @@ export default {
   },
   updated() {
     console.log('updated')
-    console.log(this.threeWhiteAssociation)
   },
   computed: {
     isBtnActive() {
@@ -438,6 +438,7 @@ export default {
   },
   methods: {
     startRound() {
+      this.onReset()
       this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
       })
@@ -448,13 +449,14 @@ export default {
         dataFromServer => {
           console.log(dataFromServer)
         })
+      this.onReset2('all')
     },
     nextThreeWords () {
-      this.onReset2('all')
       this.$socket.emit('nextThreeWords', this.currentUser,
         dataFromServer => {
           console.log(dataFromServer)
         })
+      this.onReset2('all')
     },
     onReset () {
       this.firstWord = null
@@ -473,7 +475,6 @@ export default {
         dataFromServer => {
           console.log(dataFromServer)
         })
-
     },
 
     sendTryToGuessSecretCode() {
@@ -507,15 +508,6 @@ export default {
     },
     updateValue3(val) {
       this.$socket.emit('changeNumberThree', [val, this.currentUser], dataFromServer => {
-        console.log(dataFromServer)
-      })
-    },
-    finishRoundAndNext () {
-      this.onReset2('all')
-      this.$socket.emit('finishRound',  this.currentUser, dataFromServer => {
-        console.log(dataFromServer)
-      })
-      this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
       })
     },

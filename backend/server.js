@@ -2,21 +2,20 @@ const express = require('express');
 const {createServer} =  require('http');
 const {Server} = require('socket.io');
 const cors = require('cors');
-const app = express();
-const server = createServer(app);
+const app = express()
+const server = createServer(app)
 const users = require('./users')()
-const redis = require("redis");
-const {contains, getThreeNumbers} = require("./functions");
-const client = redis.createClient();
-
+const redis = require("redis")
+const {contains, getThreeNumbers} = require("./functions")
+const client = redis.createClient()
 const { DICTIONARY_CLASSIC } = require('./dictionaries')
 
 client.on("connect", function(connect) {
   console.log('connect to redis');
-});
+})
 client.on("error", function(error) {
   console.error(error);
-});
+})
 
 let isGameRun = false
 let isWhiteBtnPress = false
@@ -94,7 +93,6 @@ io.on("connection", socket => {
       'isActive', false,
       function(err, res) {
         if (err) console.log(err)
-        console.log(res)
         client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
         socket.join(data.room)
         if (data.isOrganizer) {
@@ -131,8 +129,6 @@ io.on("connection", socket => {
 
   socket.on('startGame', (dataFromClient, cbToClient) =>{
     isGameRun = true
-    ROUND++
-    client.set(`room:${dataFromClient.room}:roundNumber`, ROUND)
     client.set(`room:${dataFromClient.room}:game-status`, isGameRun, redis.print)
     let i=0
     let uniqueIndexForDictionary = []
@@ -198,9 +194,6 @@ io.on("connection", socket => {
   // start round
 
   socket.on('startRound', (dataFromClient, cbToClient) => {
-
-    console.log(ROUND)
-
     if (dataFromClient[1].team === 'white') {
       // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
       isWhiteBtnPress = true
@@ -209,6 +202,10 @@ io.on("connection", socket => {
       isBlackBtnPress = true
     }
     if (isWhiteBtnPress && isBlackBtnPress) {
+      ROUND++
+      client.set(`room:${dataFromClient[0][0].room}:roundNumber`, ROUND)
+      console.log(ROUND)
+      io.to(dataFromClient[0][0].room).emit('setRound', ROUND)
       isBlackBtnPress = false
       isWhiteBtnPress = false
       io.to(dataFromClient[0][0].room).emit('setActiveTeam', isBlackBtnPress)
@@ -547,12 +544,10 @@ io.on("connection", socket => {
   // finish Round
 
   socket.on('finishRound', (dataFromClient, cbToClient) => {
-    ROUND++
-    client.set(`room:${dataFromClient.room}:roundNumber`, ROUND)
+
     cbToClient()
     console.log(dataFromClient)
-
-    // исправить!!! 2 раза срабатывает!
+   // isActive false do
   })
 
   // end finish Round
@@ -560,7 +555,9 @@ io.on("connection", socket => {
   // end round
 
   socket.on('disconnecting', () => {
-    console.log(socket.rooms); // the Set contains at least the socket ID
+    console.log(socket.id)
+    console.log('disconnectionnnn')
+    console.log(socket.rooms) // the Set contains at least the socket ID
   });
   socket.on('disconnect', function (socket) {
     console.log(socket)

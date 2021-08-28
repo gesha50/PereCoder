@@ -23,6 +23,11 @@ export function SOCKET_setGameStatus (state, data) {
   state.ROUND = data[1]
 }
 
+export function SOCKET_setRound (state, data) {
+  console.log(data)
+  state.ROUND = data
+}
+
 export function  SOCKET_setTeam (state, data) {
   state.users[data[1]].team = data[0]
 }
@@ -57,7 +62,6 @@ export function  SOCKET_setThreeBlackWords (state, data) {
 
 export function  SOCKET_middleRoundResult (state, data) {
   console.log('SOCKET_middleRoundResult')
-  console.log(data)
   state.isTryBlackToGuessCorrect = data[0]
   state.isTryWhiteToGuessCorrect = data[1]
   state.blackCounterInterception = data[2]
@@ -121,7 +125,6 @@ export function setUser (state, user) {
 }
 
 export function setUserTeam (state, obj) {
-  // state.users[obj.key].team = obj.team
   console.log(data)
   if (!!data.length) {
     state.users = data
@@ -173,8 +176,5 @@ export function SOCKET_nullNumbers (state, team) {
     state.firstNumberBlack = null
     state.secondNumberBlack = null
     state.thirdNumberBlack = null
-
-    state.threeWhiteAssociation = null
-    state.threeBlackAssociation = null
   }
 }
