@@ -35,6 +35,7 @@ export default {
           alert(data)
           return
         }
+        console.log(data)
         this.setUser({
           id: data.id,
           name: this.nickname,

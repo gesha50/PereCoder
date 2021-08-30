@@ -178,3 +178,8 @@ export function SOCKET_nullNumbers (state, team) {
     state.thirdNumberBlack = null
   }
 }
+
+export function  SOCKET_isActiveUserFalse (state) {
+  console.log('SOCKET_changeNumberThree')
+  state.user.isActive = false
+}

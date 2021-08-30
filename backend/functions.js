@@ -43,20 +43,50 @@ function getRoomNumber () {
   return string
 }
 
-function isGameFinish(whIn, whHid, blIn, blHid) {
-  if (whHid === 2 && whIn<2 && blIn<2 && blHid<2){
-    return 'black win'
-  }
-  if (whHid<2 && whIn<2 && blIn===2 && blHid<2){
-    return 'black win'
-  }
-  if (whHid<2 && whIn===2 && blIn<2 && blHid<2){
+function isGameFinish(blHid, whIn, whHid, blIn) {
+  console.log(whIn)
+  console.log(whHid)
+  console.log(blIn)
+  console.log(blHid)
+  console.log(blIn - blHid)
+  console.log(whIn===2)
+  console.log(blHid===2)
+  console.log(whHid===2)
+  console.log(blIn===2)
+  if ((whHid<2 && whIn===2 && blIn<2 && blHid<2) ||
+    (whHid<2 && whIn<2 && blIn===2 && blHid<2) ||
+    (whHid===2 && whIn===2 && blIn<2 && blHid===2) ||
+    (whHid<2 && whIn===2 && blIn===2 && blHid===2) ||
+    (whHid<2 && whIn===2 && blIn<2 && blHid===2)){
     return 'white win'
   }
-  if (whHid<2 && whIn<2 && blIn<2 && blHid===2){
+  if ((whHid<2 && whIn<2 && blIn<2 && blHid===2) ||
+    (whHid === 2 && whIn<2 && blIn<2 && blHid<2) ||
+    (whHid===2 && whIn===2 && blIn===2 && blHid<2) ||
+    (whHid===2 && whIn<2 && blIn===2 && blHid===2) ||
+    (whHid===2 && whIn<2 && blIn===2 && blHid<2)){
     return 'black win'
   }
-
+  if ((whHid === 2 && whIn===2 && blIn<2 && blHid<2) ||
+    (whHid<2 && whIn<2 && blIn===2 && blHid===2) ||
+    (whHid === 2 && whIn<2 && blIn<2 && blHid===2) ||
+    (whHid<2 && whIn===2 && blIn===2 && blHid<2)) {
+    let whRes = whIn - whHid
+    let blRes = blIn - blHid
+    if (whRes === blRes) {
+      return 'super Round'
+    }
+    if (whRes>blRes) {
+      return 'white win'
+    }
+    if (whRes<blRes) {
+      return 'black win'
+    }
+  }
+  if ((whHid === 2 && whIn===2 && blIn===2 && blHid===2)) {
+    return 'super Round'
+  }
+  return 0
 }
 
 function contains(arr, elem) {

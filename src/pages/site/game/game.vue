@@ -1,6 +1,7 @@
 <template>
   <q-page padding>
     <div>Your team: {{currentUser.team}}
+      <div>name: {{currentUser.name}}</div>
       <div v-if="step > 0" >Round # {{roundNumber}}</div>
       <div v-if="currentUser.team === 'white'">
         <div>
@@ -57,7 +58,7 @@
       {{gameMessage}}
     </div>
     <div v-else-if="step === 1">
-      <div v-if="secretCode.length" class="bg-blue-grey-2" >
+      <div v-if="currentUser.isActive" class="bg-blue-grey-2" >
         !!! Secret code:
         <p class="inline-block" v-for="(num,i) in secretCode" :key="i">{{num}}</p>
 
@@ -326,7 +327,7 @@
         </div>
       </div>
       <q-btn
-        @click="startRound"
+        @click="finishAndStartRound"
         :disable="isBtnActive"
         label="Next Round"
         color="primary"
@@ -438,9 +439,19 @@ export default {
   },
   methods: {
     startRound() {
-      this.onReset()
       this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
+      })
+    },
+    finishAndStartRound() {
+      this.$socket.emit('isActiveUserFalse', this.currentUser, dataFromServer => {
+        console.log(dataFromServer)
+      })
+      this.$socket.emit('finishRound', [this.allUsers, this.currentUser], dataFromServer => {
+        console.log(dataFromServer)
+        this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
+          console.log(dataFromServer)
+        })
       })
     },
     onSubmit () {
@@ -450,6 +461,9 @@ export default {
           console.log(dataFromServer)
         })
       this.onReset2('all')
+      this.firstWord = null
+      this.secondWord = null
+      this.thirdWord = null
     },
     nextThreeWords () {
       this.$socket.emit('nextThreeWords', this.currentUser,

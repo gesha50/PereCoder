@@ -27,6 +27,8 @@ let blackCounterHindrance = 0
 let blackCounterInterception = 0
 let whiteCounterHindrance = 0
 let whiteCounterInterception = 0
+let blackActiveIndex = 0
+let whiteActiveIndex = 0
 
 app.use(cors());
 const io = new Server(server, {
@@ -91,9 +93,28 @@ io.on("connection", socket => {
       })
     }
 
-    // if (isRoomFull) {
-    //   cb('too much players in a room')
-    // }
+    if (data.isOrganizer) {
+      client.set(`room:${data.room}:players`, data.players.toString())
+    }
+    let isRoomFull = false
+    if (!data.isOrganizer) {
+      client.keys(`room:${data.room}:user:*`, function (e, usersKeyInRoom){
+        if (e) console.log(e)
+        let multi = client.multi()
+        multi.get(`room:${data.room}:players`, function (er, players){
+          if (usersKeyInRoom.length+1 > Number(players)) {
+            isRoomFull = true
+          }
+        })
+        multi.exec(function(err, replies) {
+          if (isRoomFull) {
+            cb(`room ${data.room} is Full! Too much players!`) // cb не работает...
+            console.log('room full!')
+          }
+        })
+      })
+    }
+
     // if () {
     //  cb('in game have same nickname')
     // }
@@ -124,8 +145,8 @@ io.on("connection", socket => {
           io.to(data.room).emit('updateUsers', user)
           cb(user)
         } else {
-          cb(user)
           users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
+          cb(user)
         }
       })
   })
@@ -227,26 +248,28 @@ io.on("connection", socket => {
       isBlackBtnPress = true
     }
     if (isWhiteBtnPress && isBlackBtnPress) {
+      console.log('start')
       ROUND++
       client.set(`room:${dataFromClient[0][0].room}:roundNumber`, ROUND)
-      console.log(ROUND)
       io.to(dataFromClient[0][0].room).emit('setRound', ROUND)
+
       isBlackBtnPress = false
       isWhiteBtnPress = false
       io.to(dataFromClient[0][0].room).emit('setActiveTeam', isBlackBtnPress)
+
       client.smembers(`room:${dataFromClient[0][0].room}:team:white:users`, function (e, keys) {
         if (e) console.log(e)
-        let activeIndex = 0
         if (ROUND !== 0) {
-          activeIndex++
-          if (activeIndex > keys.length-1) {
-            activeIndex = 0
+          whiteActiveIndex++
+          if (whiteActiveIndex > keys.length-1) {
+            whiteActiveIndex = 0
           }
         }
-        client.hgetall(keys[activeIndex], function (e, activeUser){
+        console.log(whiteActiveIndex)
+        client.hgetall(keys[whiteActiveIndex], function (e, activeUser){
           if (e) console.log(e)
-          client.hmset(keys[activeIndex],
-            'id', keys[activeIndex],
+          client.hmset(keys[whiteActiveIndex],
+            'id', keys[whiteActiveIndex],
             'name', activeUser.name,
             'room', activeUser.room,
             'team', activeUser.team,
@@ -262,7 +285,7 @@ io.on("connection", socket => {
               })
               multi.exec(function(error, whiteUser) {
                 if (error) console.log(error)
-                whiteUser.forEach(whUser =>{
+                whiteUser.forEach(whUser => {
                   if (whUser.isActive === 'true') {
                     let threeCorrectSecretNumbers = getThreeNumbers()
                     client.set(
@@ -277,18 +300,17 @@ io.on("connection", socket => {
       })
       client.smembers(`room:${dataFromClient[0][0].room}:team:black:users`, function (e, keys) {
         if (e) console.log(e)
-
-        let activeIndex = 0
         if (ROUND !== 0) {
-          activeIndex++
-          if (activeIndex > keys.length-1) {
-            activeIndex = 0
+          blackActiveIndex++
+          if (blackActiveIndex > keys.length-1) {
+            blackActiveIndex = 0
           }
         }
-        client.hgetall(keys[activeIndex], function (e, activeUser){
+        console.log(blackActiveIndex)
+        client.hgetall(keys[blackActiveIndex], function (e, activeUser){
           if (e) console.log(e)
-          client.hmset(keys[activeIndex],
-            'id', keys[activeIndex],
+          client.hmset(keys[blackActiveIndex],
+            'id', keys[blackActiveIndex],
             'name', activeUser.name,
             'room', activeUser.room,
             'team', activeUser.team,
@@ -548,8 +570,13 @@ io.on("connection", socket => {
                           blackCounterHindrance, whiteCounterInterception,
                           threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
                           blackThreeTryToGuessNumbers)
-                      isGameFinish(blackCounterHindrance, whiteCounterInterception,
-                                  whiteCounterHindrance, blackCounterInterception)
+                      if (isGameFinish) {
+                        // redirect to finish screen
+                        // and delete all key after 5 minutes
+                        //isGameRun = false
+                      }
+                      console.log(isGameFinish(blackCounterHindrance, whiteCounterInterception,
+                        whiteCounterHindrance, blackCounterInterception))
                     })
                 })
             })
@@ -570,11 +597,30 @@ io.on("connection", socket => {
 
   // finish Round
 
-  socket.on('finishRound', (dataFromClient, cbToClient) => {
+  socket.on('isActiveUserFalse', (dataFromClient, cbToClient) => {
+    io.to(dataFromClient.room).emit('isActiveUserFalse')
+  })
 
+  socket.on('finishRound', (dataFromClient, cbToClient) => {
+    let arr = []
+    dataFromClient[0].forEach(user=>{
+      if (user.isActive) {
+        arr.push(user)
+      }
+    })
+    arr.forEach(activeUser=>{
+      client.hmset(activeUser.id,
+        'id', activeUser.id,
+        'name', activeUser.name,
+        'room', activeUser.room,
+        'team', activeUser.team,
+        'players', activeUser.players,
+        'isOrganizer', activeUser.isOrganizer,
+        'isActive', false)
+    })
+    console.log('finish')
+    users.getAllUsers(`room:${dataFromClient[1].room}:user:*`, dataFromClient[1].room, io)
     cbToClient()
-    console.log(dataFromClient)
-   // isActive false do
   })
 
   // end finish Round
