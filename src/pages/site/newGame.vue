@@ -3,6 +3,7 @@
     <h1>newGame</h1>
     <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" dense />
     <q-input class="q-mb-md" filled v-model="players" label="How much players?" dense />
+    <p>room: {{room}}</p>
     <q-btn label="play" @click="newGame" />
   </q-page>
 </template>
@@ -15,7 +16,15 @@ export default {
     return {
       nickname: '',
       players: 4,
+      room: null,
     }
+  },
+  mounted() {
+    // получить уникальный код комнаты с сервера
+    this.$socket.emit('getRoomCode', '', dataFromServer => {
+      console.log(dataFromServer)
+      this.room = dataFromServer
+    })
   },
   methods: {
     ...mapActions({
@@ -23,13 +32,12 @@ export default {
     }),
     newGame() {
       // this.$socket.emit('test', dataToServer, dataFromServer => {})
-      // получить уникальный код комнаты с сервера
-      const room = '1111'
+
       this.$socket.emit('registerNewGame', {
         name: this.nickname,
         players: this.players,
         team: 'black',
-        room: room,
+        room: this.room,
         isOrganizer: true,
         isActive: false
       }, data => {
@@ -41,11 +49,11 @@ export default {
           name: this.nickname,
           team: 'black',
           players: this.players,
-          room: room,
+          room: this.room,
           isOrganizer: true,
           isActive: false
         })
-        this.$router.push(`register-game/${room}`)
+        this.$router.push(`register-game/${this.room}`)
       })
     }
   }

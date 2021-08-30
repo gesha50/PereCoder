@@ -26,7 +26,7 @@ export default {
       this.$socket.emit('registerNewGame', {
         name: this.nickname,
         team: 'white',
-        room: this.room,
+        room: this.room.toString(),
         isOrganizer: false,
         isActive: false
       }, data => {
@@ -40,7 +40,7 @@ export default {
           name: this.nickname,
           team: 'white',
           players: this.players,
-          room: this.room,
+          room: this.room.toString(),
           isOrganizer: false,
           isActive: false
         })

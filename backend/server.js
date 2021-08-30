@@ -6,7 +6,7 @@ const app = express()
 const server = createServer(app)
 const users = require('./users')()
 const redis = require("redis")
-const {contains, getThreeNumbers} = require("./functions")
+const {contains, getThreeNumbers, isGameFinish, getRoomNumber, isRoomExist} = require("./functions")
 const client = redis.createClient()
 const { DICTIONARY_CLASSIC } = require('./dictionaries')
 
@@ -56,6 +56,15 @@ io.on("connection", socket => {
 
 // finish test code
 
+  socket.on('getRoomCode', (dataFromClient, cbToClient) => {
+    let room = getRoomNumber()
+    while (isRoomExist(client, room)) {
+      isRoomExist(client, room)
+    }
+    client.set(`room:${room}`, room, redis.print)
+    cbToClient(room)
+  })
+
   socket.on('registerNewGame', (data, cb) => {
     if (!data.name || !data.room) {
       cb('error nickname or room')
@@ -66,6 +75,22 @@ io.on("connection", socket => {
     if (isGameRun) {
      cb('the game is Running')
     }
+
+    if (!data.isOrganizer) {
+      let isEx = false
+      client.keys('room:????', function (e, keys) {
+        keys.forEach(key => {
+          let oldRoom = key.split(':')[1]
+          if (oldRoom === data.room) {
+            isEx = true
+          }
+        })
+        if (!isEx){
+          cb(`room ${data.room} not exist! Please start a new game or check the room number`)
+        }
+      })
+    }
+
     // if (isRoomFull) {
     //   cb('too much players in a room')
     // }
@@ -523,6 +548,8 @@ io.on("connection", socket => {
                           blackCounterHindrance, whiteCounterInterception,
                           threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
                           blackThreeTryToGuessNumbers)
+                      isGameFinish(blackCounterHindrance, whiteCounterInterception,
+                                  whiteCounterHindrance, blackCounterInterception)
                     })
                 })
             })
