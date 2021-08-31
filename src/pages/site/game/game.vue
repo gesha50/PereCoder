@@ -334,6 +334,43 @@
       />
       <p v-if="isBtnActive">{{gameMessage}}</p>
     </div>
+    <div v-else-if="isGameFinish">
+      {{isGameFinish}}
+    </div>
+    <div class="row justify-between">
+      <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
+        <div class="q-px-md">
+          <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
+        </div>
+        <div class="q-px-md">
+          <div v-if="currentUser.team==='white'">
+            <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+          </div>
+          <div v-else>
+            <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
+          </div>
+        </div>
+        <div>
+          <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+        </div>
+      </div>
+      <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
+        <div class="q-px-md">
+          <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
+        </div>
+        <div class="q-px-md">
+          <div v-if="currentUser.team==='white'">
+            <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+          </div>
+          <div v-else>
+            <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
+          </div>
+        </div>
+        <div>
+          <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+        </div>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -346,7 +383,12 @@ export default {
       secondWord: null,
       thirdWord: null,
       isPlayer: false,
-      isActive: this.$store.state.socket.user.isActive
+      isActive: this.$store.state.socket.user.isActive,
+    }
+  },
+  beforeUpdate() {
+    if (this.isGameFinish) {
+      this.redirect()
     }
   },
   updated() {
@@ -358,6 +400,15 @@ export default {
         return true
       }
       return false
+    },
+    listGameWhiteSide() {
+      return this.$store.getters["socket/listGameWhiteSide"]
+    },
+    listGameBlackSide() {
+      return this.$store.getters["socket/listGameBlackSide"]
+    },
+    isGameFinish() {
+      return this.$store.getters["socket/whoIsWinner"]
     },
     blackCounterHindrance () {
       return this.$store.getters["socket/blackCounterHindrance"]
@@ -454,6 +505,36 @@ export default {
         })
       })
     },
+    writeResultToListMiddle() {
+      let threeTryNumbersArrW = [this.firstNumberWhite, this.secondNumberWhite, this.thirdNumberWhite]
+
+      let threeTryNumbersArrB = [this.firstNumberBlack, this.secondNumberBlack, this.thirdNumberBlack]
+
+      let threeWordsArr = this.threeWhiteAssociation
+      let obj = {
+        threeWords: threeWordsArr,
+        threeTryNumbersW: threeTryNumbersArrW,
+        threeTryNumbersB: threeTryNumbersArrB,
+        threeCorrectNumbers: [this.correctFirstNumber,this.correctSecondNumber,this.correctThirdNumber],
+      }
+      this.$socket.emit('addResultToList', [obj, this.currentUser.room], dataFromServer=>{
+        console.log(dataFromServer)
+      })
+    },
+    writeResultToListEnd() {
+      let threeTryNumbersArrW = [this.firstNumberWhite, this.secondNumberWhite, this.thirdNumberWhite]
+      let threeTryNumbersArrB = [this.firstNumberBlack, this.secondNumberBlack, this.thirdNumberBlack]
+      let threeWordsArr = this.threeBlackAssociation
+      let obj = {
+        threeWords: threeWordsArr,
+        threeTryNumbersW: threeTryNumbersArrW,
+        threeTryNumbersB: threeTryNumbersArrB,
+        threeCorrectNumbers: [this.correctFirstNumber,this.correctSecondNumber,this.correctThirdNumber],
+      }
+      this.$socket.emit('addResultToListBlack', [obj, this.currentUser.room], dataFromServer=>{
+        console.log(dataFromServer)
+      })
+    },
     onSubmit () {
       this.$socket.emit('readyThreeWords',
         [[this.firstWord,this.secondWord,this.thirdWord], this.currentUser],
@@ -487,7 +568,9 @@ export default {
       this.$socket.emit('nextTryToGuessSecretCode',
         [arr, this.currentUser],
         dataFromServer => {
-          console.log(dataFromServer)
+          setTimeout(() => {
+            this.writeResultToListEnd()
+          },2000)
         })
     },
 
@@ -501,14 +584,15 @@ export default {
       this.$socket.emit('tryToGuessSecretCode',
         [arr, this.currentUser],
         dataFromServer => {
-          console.log(dataFromServer)
+          setTimeout(() => {
+            this.writeResultToListMiddle()
+          },2000)
         })
     },
     onReset2 (team) {
       this.$socket.emit('nullNumbers', [team, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
       })
-      // this.$store.dispatch('socket/resetNumbers', team)
     },
     updateValue1(val) {
       this.$socket.emit('changeNumberOne', [val, this.currentUser], dataFromServer => {
@@ -525,6 +609,9 @@ export default {
         console.log(dataFromServer)
       })
     },
+    redirect(){
+      this.$router.push('/finish')
+    }
   }
 }
 </script>

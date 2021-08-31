@@ -28,5 +28,10 @@ export default function () {
     correctFirstNumber: null,
     correctSecondNumber: null,
     correctThirdNumber: null,
+
+    listGameWhiteSide: [],
+    listGameBlackSide: [],
+
+    whoIsWinner: null,
   }
 }

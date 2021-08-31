@@ -69,8 +69,13 @@ io.on("connection", socket => {
 
   socket.on('registerNewGame', (data, cb) => {
     if (!data.name || !data.room) {
-      cb('error nickname or room')
+      cb('error! Empty nickname or room')
     }
+
+    // if () {
+    //  cb('in game have same nickname')
+    // }
+
     // if (client.get(`room:${data.room}:game-status`, redis.print)) {
       console.log(client.get(`room:${data.room}:game-status`, redis.print))
     // }
@@ -92,7 +97,14 @@ io.on("connection", socket => {
         }
       })
     }
-
+    const user = {
+      id: socket.id,
+      name: data.name,
+      room: data.room,
+      team: data.team,
+      players: data.players ? data.players : 0,
+      isOrganizer: data.isOrganizer
+    }
     if (data.isOrganizer) {
       client.set(`room:${data.room}:players`, data.players.toString())
     }
@@ -108,47 +120,46 @@ io.on("connection", socket => {
         })
         multi.exec(function(err, replies) {
           if (isRoomFull) {
-            cb(`room ${data.room} is Full! Too much players!`) // cb не работает...
-            console.log('room full!')
+            cb(`room ${data.room} is Full! Too much players!`)
+          } else {
+            client.del(socket.id)
+            client.hmset(socket.id,
+              'id', socket.id,
+              'name', user.name,
+              'room', user.room,
+              'team', user.team,
+              'players', user.players,
+              'isOrganizer', user.isOrganizer,
+              'isActive', false,
+              function(err, res) {
+                if (err) console.log(err)
+                client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
+                socket.join(data.room)
+                users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
+                cb(user)
+              })
           }
         })
       })
     }
-
-    // if () {
-    //  cb('in game have same nickname')
-    // }
-
-    const user = {
-      id: socket.id,
-      name: data.name,
-      room: data.room,
-      team: data.team,
-      players: data.players ? data.players : 0,
-      isOrganizer: data.isOrganizer
-    }
-
-    client.del(socket.id)
-    client.hmset(socket.id,
-      'id', socket.id,
-      'name', user.name,
-      'room', user.room,
-      'team', user.team,
-      'players', user.players,
-      'isOrganizer', user.isOrganizer,
-      'isActive', false,
-      function(err, res) {
-        if (err) console.log(err)
-        client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
-        socket.join(data.room)
-        if (data.isOrganizer) {
+    if (data.isOrganizer) {
+      client.del(socket.id)
+      client.hmset(socket.id,
+        'id', socket.id,
+        'name', user.name,
+        'room', user.room,
+        'team', user.team,
+        'players', user.players,
+        'isOrganizer', user.isOrganizer,
+        'isActive', false,
+        function (err, res) {
+          if (err) console.log(err)
+          client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
+          socket.join(data.room)
           io.to(data.room).emit('updateUsers', user)
           cb(user)
-        } else {
-          users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
-          cb(user)
-        }
-      })
+        })
+    }
   })
 
   socket.on('setUserTeam', (dataFromClient, cbToClient) => {
@@ -412,6 +423,7 @@ io.on("connection", socket => {
     io.to(`${dataFromClient[1].room}-${dataFromClient[1].team}`)
       .emit('nullNumbers', dataFromClient[0])
   })
+
   // tryToGuessSecretCode
 
   socket.on('tryToGuessSecretCode', (dataFromClient, cbToClient) => {
@@ -466,6 +478,7 @@ io.on("connection", socket => {
                           blackCounterInterception, whiteCounterHindrance,
                           threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
                           blackThreeTryToGuessNumbers)
+                      cbToClient()
                     })
                 })
             })
@@ -473,10 +486,8 @@ io.on("connection", socket => {
         } else {
           if (isWhiteBtnPress) {
             io.to(`${dataFromClient[1].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
-            cbToClient()
           } else {
             io.to(`${dataFromClient[1].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
-            cbToClient()
           }
         }
       })
@@ -570,13 +581,24 @@ io.on("connection", socket => {
                           blackCounterHindrance, whiteCounterInterception,
                           threeCorrectSecretNumbers, whiteThreeTryToGuessNumbers,
                           blackThreeTryToGuessNumbers)
-                      if (isGameFinish) {
+                      cbToClient()
+                      let  finishGame = isGameFinish(blackCounterHindrance, whiteCounterInterception,
+                        whiteCounterHindrance, blackCounterInterception)
+                      if (finishGame) {
+                        if (finishGame === 'blackWin') {
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black')
+                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'black')
+                        } else if (finishGame === 'whiteWin') {
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'white')
+                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'white')
+                        } else {
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'superRound')
+                        }
                         // redirect to finish screen
                         // and delete all key after 5 minutes
                         //isGameRun = false
                       }
-                      console.log(isGameFinish(blackCounterHindrance, whiteCounterInterception,
-                        whiteCounterHindrance, blackCounterInterception))
+                      console.log(finishGame)
                     })
                 })
             })
@@ -584,10 +606,8 @@ io.on("connection", socket => {
         } else {
           if (isWhiteBtnPress) {
             io.to(`${dataFromClient[1].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
-            cbToClient()
           } else {
             io.to(`${dataFromClient[1].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
-            cbToClient()
           }
         }
       })
@@ -622,6 +642,24 @@ io.on("connection", socket => {
     users.getAllUsers(`room:${dataFromClient[1].room}:user:*`, dataFromClient[1].room, io)
     cbToClient()
   })
+
+  // addResultToList
+
+  socket.on('addResultToList', (dataFromClient, cbToClient) => {
+    io.to(dataFromClient[1]).emit('listGameWhiteSide', dataFromClient[0])
+    cbToClient()
+  })
+
+  // end addResultToList
+
+  // addResultToListBlack
+
+  socket.on('addResultToListBlack', (dataFromClient, cbToClient) => {
+    io.to(dataFromClient[1]).emit('listGameBlackSide', dataFromClient[0])
+    cbToClient()
+  })
+
+  // end addResultToListBlack
 
   // end finish Round
 

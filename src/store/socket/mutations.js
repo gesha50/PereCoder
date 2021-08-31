@@ -180,6 +180,24 @@ export function SOCKET_nullNumbers (state, team) {
 }
 
 export function  SOCKET_isActiveUserFalse (state) {
-  console.log('SOCKET_changeNumberThree')
+  console.log('SOCKET_isActiveUserFalse')
   state.user.isActive = false
 }
+
+export function  SOCKET_whoIsWinner (state, data) {
+  console.log('SOCKET_whoIsWinner')
+  state.whoIsWinner = data
+}
+
+export function  SOCKET_listGameWhiteSide (state, data) {
+  console.log('SOCKET_listGameWhiteSide')
+  console.log(data)
+  state.listGameWhiteSide.push(data)
+}
+
+export function  SOCKET_listGameBlackSide (state, data) {
+  console.log('SOCKET_listGameBlackSide')
+  state.listGameBlackSide.push(data)
+}
+
+

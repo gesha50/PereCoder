@@ -48,24 +48,19 @@ function isGameFinish(blHid, whIn, whHid, blIn) {
   console.log(whHid)
   console.log(blIn)
   console.log(blHid)
-  console.log(blIn - blHid)
-  console.log(whIn===2)
-  console.log(blHid===2)
-  console.log(whHid===2)
-  console.log(blIn===2)
   if ((whHid<2 && whIn===2 && blIn<2 && blHid<2) ||
     (whHid<2 && whIn<2 && blIn===2 && blHid<2) ||
     (whHid===2 && whIn===2 && blIn<2 && blHid===2) ||
     (whHid<2 && whIn===2 && blIn===2 && blHid===2) ||
     (whHid<2 && whIn===2 && blIn<2 && blHid===2)){
-    return 'white win'
+    return 'whiteWin'
   }
   if ((whHid<2 && whIn<2 && blIn<2 && blHid===2) ||
     (whHid === 2 && whIn<2 && blIn<2 && blHid<2) ||
     (whHid===2 && whIn===2 && blIn===2 && blHid<2) ||
     (whHid===2 && whIn<2 && blIn===2 && blHid===2) ||
     (whHid===2 && whIn<2 && blIn===2 && blHid<2)){
-    return 'black win'
+    return 'blackWin'
   }
   if ((whHid === 2 && whIn===2 && blIn<2 && blHid<2) ||
     (whHid<2 && whIn<2 && blIn===2 && blHid===2) ||
@@ -74,17 +69,17 @@ function isGameFinish(blHid, whIn, whHid, blIn) {
     let whRes = whIn - whHid
     let blRes = blIn - blHid
     if (whRes === blRes) {
-      return 'super Round'
+      return 'superRound'
     }
     if (whRes>blRes) {
-      return 'white win'
+      return 'whiteWin'
     }
     if (whRes<blRes) {
-      return 'black win'
+      return 'blackWin'
     }
   }
   if ((whHid === 2 && whIn===2 && blIn===2 && blHid===2)) {
-    return 'super Round'
+    return 'superRound'
   }
   return 0
 }

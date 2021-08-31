@@ -12,11 +12,6 @@
 
 export default {
   name: "index",
-  data() {
-    return {
-      // counter: this.$q.localStorage.getItem('counter'),
-    }
-  },
   methods: {
     newMes() {
       // console.log(this.$socket)

@@ -101,5 +101,15 @@ export function correctThirdNumber (state) {
   return state.correctThirdNumber
 }
 
+export function whoIsWinner (state) {
+  return state.whoIsWinner
+}
 
+export function listGameWhiteSide (state) {
+  return state.listGameWhiteSide
+}
+
+export function listGameBlackSide (state) {
+  return state.listGameBlackSide
+}
 
