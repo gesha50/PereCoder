@@ -1,7 +1,11 @@
 <template>
 <q-page padding>
   <h6>finish</h6>
-  <div>{{whoIsWinner}}</div>
+  <div> Win:  {{whoIsWinner}}</div>
+  <q-btn
+    label="Home"
+    @click="goHome"
+  />
 </q-page>
 </template>
 
@@ -11,6 +15,12 @@ export default {
   computed: {
     whoIsWinner() {
       return this.$store.getters["socket/whoIsWinner"]
+    },
+  },
+  methods: {
+    goHome() {
+      this.$store.dispatch('socket/allDataNull')
+      this.$router.push('/')
     },
   },
 }

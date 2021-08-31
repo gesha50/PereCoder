@@ -388,14 +388,13 @@ io.on("connection", socket => {
       client.zrange(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:association`, 0, -1, function (e, res) {
         if (e) console.log(e)
         io.to(dataFromClient[1].room).emit('setThreeWhiteWords', res)
+        cbToClient()
       })
     } else {
       if (isWhiteBtnPress) {
         io.to(`${dataFromClient[1].room}-white`).emit('setActiveTeam', isWhiteBtnPress, 'wait your opponent')
-        cbToClient()
       } else {
         io.to(`${dataFromClient[1].room}-black`).emit('setActiveTeam', isBlackBtnPress, 'wait your opponent')
-        cbToClient()
       }
     }
   })
@@ -585,6 +584,16 @@ io.on("connection", socket => {
                       let  finishGame = isGameFinish(blackCounterHindrance, whiteCounterInterception,
                         whiteCounterHindrance, blackCounterInterception)
                       if (finishGame) {
+                        isGameRun = false
+                        isWhiteBtnPress = false
+                        isBlackBtnPress = false
+                        ROUND = 0
+                        blackCounterHindrance = 0
+                        blackCounterInterception = 0
+                        whiteCounterHindrance = 0
+                        whiteCounterInterception = 0
+                        blackActiveIndex = 0
+                        whiteActiveIndex = 0
                         if (finishGame === 'blackWin') {
                           client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black')
                           io.to(dataFromClient[1].room).emit('whoIsWinner', 'black')
@@ -594,9 +603,7 @@ io.on("connection", socket => {
                         } else {
                           client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'superRound')
                         }
-                        // redirect to finish screen
                         // and delete all key after 5 minutes
-                        //isGameRun = false
                       }
                       console.log(finishGame)
                     })

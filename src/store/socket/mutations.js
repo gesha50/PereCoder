@@ -208,4 +208,42 @@ export function  SOCKET_listGameBlackSide (state, data) {
   state.associationsForBlackSecretWords[data.threeCorrectNumbers[2]-1].push(data.threeWords[2])
 }
 
+export function  allDataNull (state) {
+  state.ROUND = 0
+  state.user = null
+  state.users = []
+  state.message = []
+  state.FOUR_GAME_WORDS = []
+  state.isGameRun = false
+  state.threeNumbers = []
+  state.gameMessage = null
+  state.step = 0
+  state.isTeamReady = false
+  state.threeWhiteAssociation = null
+  state.threeBlackAssociation = null
+  state.firstNumberWhite = null
+  state.secondNumberWhite = null
+  state.thirdNumberWhite = null
+  state.isTryBlackToGuessCorrect = false
+  state.isTryWhiteToGuessCorrectv = false
+  state.blackCounterHindrance = 0
+  state.blackCounterInterception = 0
+  state.whiteCounterHindrance = 0
+  state.whiteCounterInterception = 0
+  state.firstNumberBlack = null
+  state.secondNumberBlack = null
+  state.thirdNumberBlack = null
+
+  state.correctFirstNumber = null
+  state.correctSecondNumber = null
+  state.correctThirdNumber = null
+
+  state.listGameWhiteSide = []
+  state.listGameBlackSide = []
+
+  state.associationsForWhiteSecretWords = [[],[],[],[]]
+  state.associationsForBlackSecretWords = [[],[],[],[]]
+
+  state.whoIsWinner = null
+}
 

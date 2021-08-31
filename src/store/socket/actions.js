@@ -11,3 +11,7 @@ export function resetNumbers ({commit}) {
   commit('resetNumbers')
 }
 
+export function allDataNull ({commit}) {
+  commit('allDataNull')
+}
+

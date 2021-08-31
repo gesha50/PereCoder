@@ -61,37 +61,72 @@
       <div v-if="currentUser.isActive" class="bg-blue-grey-2" >
         !!! Secret code:
         <p class="inline-block" v-for="(num,i) in secretCode" :key="i">{{num}}</p>
-
         <div class="q-pa-md" style="max-width: 400px">
-
           <q-form
             @submit="onSubmit"
             @reset="onReset"
             class="q-gutter-md"
           >
-            <q-input
-              :disable="isBtnActive"
-              filled
-              v-model="firstWord"
-              label="first association"
-              hint="use secret code numbers!!!"
-              :rules="[val => !!val || 'Field is required']"
-            />
-            <q-input
-              :disable="isBtnActive"
-              filled
-              v-model="secondWord"
-              label="second association"
-              :rules="[val => !!val || 'Field is required']"
-            />
-            <q-input
-              :disable="isBtnActive"
-              filled
-              v-model="thirdWord"
-              label="third association"
-              :rules="[val => !!val || 'Field is required']"
-            />
-
+            <div v-if="currentUser.team === 'white'">
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="firstWord"
+                label="first association"
+                hint="use secret code numbers!!!"
+                :rules="[val => !!val || 'Field is required',
+                      val => associationsForWhiteSecretWords[secretCode[0]-1].indexOf(val)  === -1 ||
+                       'You have the same association for this word']"
+              />
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="secondWord"
+                label="second association"
+                :rules="[val => !!val || 'Field is required',
+                       val => associationsForWhiteSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
+                       'You have the same association for this word']"
+              />
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="thirdWord"
+                label="third association"
+                :rules="[val => !!val || 'Field is required',
+                      val => associationsForWhiteSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
+                       'You have the same association for this word']"
+              />
+            </div>
+            <div v-else>
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="firstWord"
+                label="first association"
+                hint="use secret code numbers!!!"
+                :rules="[val => !!val || 'Field is required',
+                      val => associationsForBlackSecretWords[secretCode[0]-1].indexOf(val) === -1 ||
+                       'You have the same association for this word']"
+              />
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="secondWord"
+                label="second association"
+                :rules="[val => !!val || 'Field is required',
+                       val => associationsForBlackSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
+                       'You have the same association for this word']"
+              />
+              <q-input
+                :disable="isBtnActive"
+                filled
+                v-model="thirdWord"
+                label="third association"
+                :rules="[val => !!val || 'Field is required',
+                      val => associationsForBlackSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
+                       'You have the same association for this word']"
+              />
+            </div>
             <div>
               <q-btn :disable="isBtnActive" label="Submit" type="submit" color="primary"/>
               <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
@@ -441,6 +476,7 @@
     <div class="row justify-between">
       <div>
         <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
+          white
         <div class="q-px-md">
           <div v-for="(word, ind1) in obj.threeWords" :key="ind1">{{word}}</div>
         </div>
@@ -500,6 +536,7 @@
         </div>
       </div>
       <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
+        black
         <div class="q-px-md">
           <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
         </div>
