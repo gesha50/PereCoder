@@ -113,3 +113,10 @@ export function listGameBlackSide (state) {
   return state.listGameBlackSide
 }
 
+export function associationsForWhiteSecretWords (state) {
+  return state.associationsForWhiteSecretWords
+}
+
+export function associationsForBlackSecretWords (state) {
+  return state.associationsForBlackSecretWords
+}

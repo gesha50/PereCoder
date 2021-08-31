@@ -338,20 +338,64 @@
       {{isGameFinish}}
     </div>
     <div class="row justify-between">
-      <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
+      <div>
+        <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
         <div class="q-px-md">
-          <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
+          <div v-for="(word, ind1) in obj.threeWords" :key="ind1">{{word}}</div>
         </div>
         <div class="q-px-md">
           <div v-if="currentUser.team==='white'">
-            <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+            <div v-for="(tryNumber, ind2) in obj.threeTryNumbersW" :key="ind2">{{tryNumber}}</div>
           </div>
           <div v-else>
-            <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
+            <div v-for="(tryNumber, ind3) in obj.threeTryNumbersB" :key="ind3">{{tryNumber}}</div>
           </div>
         </div>
         <div>
-          <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+          <div v-for="(correctNumber, ind4) in obj.threeCorrectNumbers" :key="ind4">{{correctNumber}}</div>
+        </div>
+      </div>
+        <div
+          class="row"
+          v-if="associationsForWhiteSecretWords[0].length ||
+              associationsForWhiteSecretWords[1].length"
+        >
+          <div class="q-mx-sm">
+            1
+            <div
+              v-for="(forFirstSecretWord, i1) in associationsForWhiteSecretWords[0]"
+              :key="i1"
+            >
+              {{forFirstSecretWord}}
+            </div>
+          </div>
+          <div class="q-mx-sm">
+            2
+            <div
+              v-for="(forSecondSecretWord, i2) in associationsForWhiteSecretWords[1]"
+              :key="i2"
+            >
+              {{forSecondSecretWord}}
+            </div>
+          </div>
+          <div class="q-mx-sm">
+            3
+            <div
+              v-for="(forThirdSecretWord, i3) in associationsForWhiteSecretWords[2]"
+              :key="i3"
+            >
+              {{forThirdSecretWord}}
+            </div>
+          </div>
+          <div class="q-mx-sm">
+            4
+            <div
+              v-for="(forFoursSecretWord, i4) in associationsForWhiteSecretWords[3]"
+              :key="i4"
+            >
+              {{forFoursSecretWord}}
+            </div>
+          </div>
         </div>
       </div>
       <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
@@ -368,6 +412,48 @@
         </div>
         <div>
           <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+        </div>
+      </div>
+      <div
+        class="row"
+        v-if="associationsForBlackSecretWords[0].length ||
+              associationsForBlackSecretWords[1].length"
+      >
+        <div class="q-mx-sm">
+          1
+          <div
+            v-for="(forFirstSecretWord, i1) in associationsForBlackSecretWords[0]"
+            :key="i1"
+          >
+            {{forFirstSecretWord}}
+          </div>
+        </div>
+        <div class="q-mx-sm">
+          2
+          <div
+            v-for="(forSecondSecretWord, i2) in associationsForBlackSecretWords[1]"
+            :key="i2"
+          >
+            {{forSecondSecretWord}}
+          </div>
+        </div>
+        <div class="q-mx-sm">
+          3
+          <div
+            v-for="(forThirdSecretWord, i3) in associationsForBlackSecretWords[2]"
+            :key="i3"
+          >
+            {{forThirdSecretWord}}
+          </div>
+        </div>
+        <div class="q-mx-sm">
+          4
+          <div
+            v-for="(forFoursSecretWord, i4) in associationsForBlackSecretWords[3]"
+            :key="i4"
+          >
+            {{forFoursSecretWord}}
+          </div>
         </div>
       </div>
     </div>
@@ -400,6 +486,12 @@ export default {
         return true
       }
       return false
+    },
+    associationsForBlackSecretWords() {
+      return this.$store.getters["socket/associationsForBlackSecretWords"]
+    },
+    associationsForWhiteSecretWords() {
+      return this.$store.getters["socket/associationsForWhiteSecretWords"]
     },
     listGameWhiteSide() {
       return this.$store.getters["socket/listGameWhiteSide"]
@@ -570,7 +662,7 @@ export default {
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListEnd()
-          },2000)
+          },1000)
         })
     },
 
@@ -586,7 +678,7 @@ export default {
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListMiddle()
-          },2000)
+          },1000)
         })
     },
     onReset2 (team) {

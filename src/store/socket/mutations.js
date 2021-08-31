@@ -193,11 +193,19 @@ export function  SOCKET_listGameWhiteSide (state, data) {
   console.log('SOCKET_listGameWhiteSide')
   console.log(data)
   state.listGameWhiteSide.push(data)
+
+  state.associationsForWhiteSecretWords[data.threeCorrectNumbers[0]-1].push(data.threeWords[0])
+  state.associationsForWhiteSecretWords[data.threeCorrectNumbers[1]-1].push(data.threeWords[1])
+  state.associationsForWhiteSecretWords[data.threeCorrectNumbers[2]-1].push(data.threeWords[2])
 }
 
 export function  SOCKET_listGameBlackSide (state, data) {
   console.log('SOCKET_listGameBlackSide')
   state.listGameBlackSide.push(data)
+
+  state.associationsForBlackSecretWords[data.threeCorrectNumbers[0]-1].push(data.threeWords[0])
+  state.associationsForBlackSecretWords[data.threeCorrectNumbers[1]-1].push(data.threeWords[1])
+  state.associationsForBlackSecretWords[data.threeCorrectNumbers[2]-1].push(data.threeWords[2])
 }
 
 

@@ -44,10 +44,6 @@ function getRoomNumber () {
 }
 
 function isGameFinish(blHid, whIn, whHid, blIn) {
-  console.log(whIn)
-  console.log(whHid)
-  console.log(blIn)
-  console.log(blHid)
   if ((whHid<2 && whIn===2 && blIn<2 && blHid<2) ||
     (whHid<2 && whIn<2 && blIn===2 && blHid<2) ||
     (whHid===2 && whIn===2 && blIn<2 && blHid===2) ||
