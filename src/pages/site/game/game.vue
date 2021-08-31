@@ -75,18 +75,21 @@
               v-model="firstWord"
               label="first association"
               hint="use secret code numbers!!!"
+              :rules="[val => !!val || 'Field is required']"
             />
             <q-input
               :disable="isBtnActive"
               filled
               v-model="secondWord"
               label="second association"
+              :rules="[val => !!val || 'Field is required']"
             />
             <q-input
               :disable="isBtnActive"
               filled
               v-model="thirdWord"
               label="third association"
+              :rules="[val => !!val || 'Field is required']"
             />
 
             <div>
@@ -115,72 +118,121 @@
         @reset="onReset2(currentUser.team)"
         class="q-gutter-md"
       >
-        <div class="q-gutter-md" v-if="currentUser.team === 'white'">
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue1($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="firstNumberWhite"
-          />
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue2($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="secondNumberWhite"
-          />
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue3($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="thirdNumberWhite"
-          />
+        <div class="q-gutter-md row justify-center" v-if="currentUser.team === 'white'">
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue1($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="firstNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue2($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="secondNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue3($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="thirdNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
         </div>
-        <div class="q-gutter-md" v-else>
-          <q-input
+        <div class="q-gutter-md row justify-center" v-else>
+          <div>
+            <q-input
             :disable="isBtnActive"
             @input="updateValue1($event)"
             class="inline-block"
             filled
-            style="max-width: 70px"
+            style="max-width: 150px"
             type="number"
             :value="firstNumberBlack"
+            lazy-rules
+            :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
           />
-          <q-input
-            :disable="isBtnActive"
-            @input="updateValue2($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="secondNumberBlack"
-          />
-          <q-input
-            :disable="isBtnActive"
-            @input="updateValue3($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="thirdNumberBlack"
-          />
+          </div>
+          <div>
+            <q-input
+              :disable="isBtnActive"
+              @input="updateValue2($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="secondNumberBlack"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="isBtnActive"
+              @input="updateValue3($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="thirdNumberBlack"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
         </div>
         <div>
           <q-btn
-            :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
+            :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive || notSameNumbers"
             label="Submit" type="submit" color="primary"/>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
             label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
           <p v-if="isBtnActive">{{gameMessage}}</p>
+          <p v-if="disableMessageForSameNumbers">{{disableMessageForSameNumbers}}</p>
         </div>
       </q-form>
     </div>
@@ -228,72 +280,121 @@
         @reset="onReset2(currentUser.team)"
         class="q-gutter-md"
       >
-        <div class="q-gutter-md" v-if="currentUser.team === 'white'">
-          <q-input
-            :disable="isBtnActive"
-            @input="updateValue1($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="firstNumberWhite"
-          />
-          <q-input
-            :disable="isBtnActive"
-            @input="updateValue2($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="secondNumberWhite"
-          />
-          <q-input
-            :disable="isBtnActive"
-            @input="updateValue3($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="thirdNumberWhite"
-          />
+        <div class="q-gutter-md row justify-center" v-if="currentUser.team === 'white'">
+          <div>
+            <q-input
+              :disable="isBtnActive"
+              @input="updateValue1($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="firstNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="isBtnActive"
+              @input="updateValue2($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="secondNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="isBtnActive"
+              @input="updateValue3($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="thirdNumberWhite"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
         </div>
-        <div class="q-gutter-md" v-else>
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue1($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="firstNumberBlack"
-          />
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue2($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="secondNumberBlack"
-          />
-          <q-input
-            :disable="currentUser.isActive || isBtnActive"
-            @input="updateValue3($event)"
-            class="inline-block"
-            filled
-            style="max-width: 70px"
-            type="number"
-            :value="thirdNumberBlack"
-          />
+        <div class="q-gutter-md row justify-center" v-else>
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue1($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="firstNumberBlack"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue2($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="secondNumberBlack"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
+          <div>
+            <q-input
+              :disable="currentUser.isActive || isBtnActive"
+              @input="updateValue3($event)"
+              class="inline-block"
+              filled
+              style="max-width: 150px"
+              type="number"
+              :value="thirdNumberBlack"
+              lazy-rules
+              :rules="[
+               val => !!val || '* Required',
+                val => val.length < 2 || 'Please use maximum 1 character',
+                val => val > 0 && val < 5 || 'Please type a real number'
+            ]"
+            />
+          </div>
         </div>
         <div>
           <q-btn
-            :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive"
+            :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive || notSameNumbers"
             label="Submit" type="submit" color="primary"/>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive"
             label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
           <p v-if="isBtnActive">{{gameMessage}}</p>
+          <p v-if="disableMessageForSameNumbers">{{disableMessageForSameNumbers}}</p>
         </div>
       </q-form>
     </div>
@@ -465,6 +566,7 @@ export default {
   name: "game",
   data() {
     return {
+      disableMessageForSameNumbers: null,
       firstWord: null,
       secondWord: null,
       thirdWord: null,
@@ -481,6 +583,26 @@ export default {
     console.log('updated')
   },
   computed: {
+    notSameNumbers() {
+      if (this.currentUser.team === 'white') {
+        if (this.firstNumberWhite === this.secondNumberWhite ||
+          this.thirdNumberWhite === this.secondNumberWhite ||
+          this.firstNumberWhite === this.thirdNumberWhite) {
+          this.disableMessageForSameNumbers = 'not same numbers please'
+          return true
+        }
+        this.disableMessageForSameNumbers = null
+        return false
+      }
+      if (this.firstNumberBlack === this.secondNumberBlack ||
+        this.thirdNumberBlack === this.secondNumberBlack ||
+        this.firstNumberBlack === this.thirdNumberBlack) {
+        this.disableMessageForSameNumbers = 'not same numbers please'
+        return true
+      }
+      this.disableMessageForSameNumbers = null
+      return false
+    },
     isBtnActive() {
       if (this.isTeamReady) {
         return true
@@ -634,9 +756,11 @@ export default {
           console.log(dataFromServer)
         })
       this.onReset2('all')
-      this.firstWord = null
-      this.secondWord = null
-      this.thirdWord = null
+      setTimeout(()=>{
+        this.firstWord = null
+        this.secondWord = null
+        this.thirdWord = null
+      },20000)
     },
     nextThreeWords () {
       this.$socket.emit('nextThreeWords', this.currentUser,
