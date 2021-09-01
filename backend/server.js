@@ -72,12 +72,8 @@ io.on("connection", socket => {
       cb('error! Empty nickname or room')
     }
 
-    // if () {
-    //  cb('in game have same nickname')
-    // }
-
     // if (client.get(`room:${data.room}:game-status`, redis.print)) {
-      console.log(client.get(`room:${data.room}:game-status`, redis.print))
+    //   console.log(client.get(`room:${data.room}:game-status`, redis.print))
     // }
     if (isGameRun) {
      cb('the game is Running')
@@ -122,28 +118,37 @@ io.on("connection", socket => {
           if (isRoomFull) {
             cb(`room ${data.room} is Full! Too much players!`)
           } else {
-            client.del(socket.id)
-            client.hmset(socket.id,
-              'id', socket.id,
-              'name', user.name,
-              'room', user.room,
-              'team', user.team,
-              'players', user.players,
-              'isOrganizer', user.isOrganizer,
-              'isActive', false,
-              function(err, res) {
-                if (err) console.log(err)
-                client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
-                socket.join(data.room)
-                users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
-                cb(user)
-              })
+            client.smembers(`room:${data.room}:name`, function (e, allUsersName){
+              if (e) console.log(e)
+              if (allUsersName.indexOf(user.name) !== -1) {
+               cb('in game have same nickname')
+              } else {
+                client.del(socket.id)
+                client.sadd(`room:${data.room}:name`, user.name)
+                client.hmset(socket.id,
+                  'id', socket.id,
+                  'name', user.name,
+                  'room', user.room,
+                  'team', user.team,
+                  'players', user.players,
+                  'isOrganizer', user.isOrganizer,
+                  'isActive', false,
+                  function(err, res) {
+                    if (err) console.log(err)
+                    client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
+                    socket.join(data.room)
+                    users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
+                    cb(user)
+                  })
+              }
+            })
           }
         })
       })
     }
     if (data.isOrganizer) {
       client.del(socket.id)
+      client.sadd(`room:${data.room}:name`, user.name)
       client.hmset(socket.id,
         'id', socket.id,
         'name', user.name,
@@ -234,13 +239,10 @@ io.on("connection", socket => {
         if (res.team === 'white') {
           client.sadd(`room:${dataFromClient.room}:team:white:users`, res.id)
           socket.join(teamWhite)
-          console.log(socket.rooms)
           socket.emit('setFourWords', FOUR_WORDS_WHITE)
         } else {
-          console.log('black')
           client.sadd(`room:${dataFromClient.room}:team:black:users`, res.id)
           socket.join(teamBlack)
-          console.log(socket.rooms)
           socket.emit('setFourWords', FOUR_WORDS_BLACK)
         }
       })
