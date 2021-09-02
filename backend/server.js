@@ -30,6 +30,19 @@ let whiteCounterInterception = 0
 let blackActiveIndex = 0
 let whiteActiveIndex = 0
 
+function endGame() {
+  isGameRun = false
+  isWhiteBtnPress = false
+  isBlackBtnPress = false
+  ROUND = 0
+  blackCounterHindrance = 0
+  blackCounterInterception = 0
+  whiteCounterHindrance = 0
+  whiteCounterInterception = 0
+  blackActiveIndex = 0
+  whiteActiveIndex = 0
+}
+
 app.use(cors());
 const io = new Server(server, {
   cors: {
@@ -586,16 +599,7 @@ io.on("connection", socket => {
                       let  finishGame = isGameFinish(blackCounterHindrance, whiteCounterInterception,
                         whiteCounterHindrance, blackCounterInterception)
                       if (finishGame) {
-                        isGameRun = false
-                        isWhiteBtnPress = false
-                        isBlackBtnPress = false
-                        ROUND = 0
-                        blackCounterHindrance = 0
-                        blackCounterInterception = 0
-                        whiteCounterHindrance = 0
-                        whiteCounterInterception = 0
-                        blackActiveIndex = 0
-                        whiteActiveIndex = 0
+                        endGame()
                         if (finishGame === 'blackWin') {
                           client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black')
                           io.to(dataFromClient[1].room).emit('whoIsWinner', 'black')
@@ -674,14 +678,26 @@ io.on("connection", socket => {
 
   // end round
 
+  // sendMessage
+
+  socket.on('sendMessage', (dataFromClient, cbToClient) => {
+    let arr = []
+    arr.push(dataFromClient[1])
+    let obj = { name: dataFromClient[0].name, message: arr}
+    io.to(`${dataFromClient[0].room}-${dataFromClient[0].team}`)
+      .emit('sendMessage', obj)
+    cbToClient()
+  })
+
+  // end sendMessage
+
   socket.on('disconnecting', () => {
     console.log(socket.id)
     console.log('disconnectionnnn')
     console.log(socket.rooms) // the Set contains at least the socket ID
   });
   socket.on('disconnect', function (socket) {
-    console.log(socket)
-    console.log('disconnect')
+    endGame()
   })
 });
 

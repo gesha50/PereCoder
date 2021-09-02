@@ -6,6 +6,11 @@
         <img src="../../statics/logo.png">
       </q-avatar>
       <q-space></q-space>
+      <q-btn
+        class="q-mx-lg"
+        label="Home"
+        @click="goHome"
+      />
       <q-select  @input="changedLang(lang)" filled v-model="lang" :options="options" />
     </q-toolbar>
   </q-header>
@@ -34,6 +39,10 @@ export default {
     changedLang(val) {
       console.log(val)
       this.$store.dispatch('header/setLang', val)
+    },
+    goHome() {
+      this.$store.dispatch('socket/allDataNull')
+      this.$router.push('/')
     },
   },
 }

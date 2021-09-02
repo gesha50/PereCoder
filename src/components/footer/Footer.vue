@@ -1,29 +1,29 @@
 <template>
   <q-footer class="footer bg-white text-grey-9">
-    <div style="max-width: 300px; margin: 20px auto">
-      <div class="q-mt-sm row justify-around">
-        <a href="tel:+79175433952">
-          <custom-icon
-            :icon="'phone'"
-          ></custom-icon>
-        </a>
-        <a href="https://github.com/gesha50?tab=repositories" target="_blank">
-          <custom-icon
-            :icon="'fab fa-github'"
-          ></custom-icon>
-        </a>
-        <a href="https://www.instagram.com/gesha50/" target="_blank">
-          <custom-icon
-            :icon="'fab fa-instagram'"
-          ></custom-icon>
-        </a>
-        <a href="https://tlgg.ru/@dev_gesha" target="_blank">
-          <custom-icon
-            :icon="'fab fa-telegram-plane'"
-          ></custom-icon>
-        </a>
-      </div>
-    </div>
+<!--    <div style="max-width: 300px; margin: 20px auto">-->
+<!--      <div class="q-mt-sm row justify-around">-->
+<!--        <a href="tel:+79175433952">-->
+<!--          <custom-icon-->
+<!--            :icon="'phone'"-->
+<!--          ></custom-icon>-->
+<!--        </a>-->
+<!--        <a href="https://github.com/gesha50?tab=repositories" target="_blank">-->
+<!--          <custom-icon-->
+<!--            :icon="'fab fa-github'"-->
+<!--          ></custom-icon>-->
+<!--        </a>-->
+<!--        <a href="https://www.instagram.com/gesha50/" target="_blank">-->
+<!--          <custom-icon-->
+<!--            :icon="'fab fa-instagram'"-->
+<!--          ></custom-icon>-->
+<!--        </a>-->
+<!--        <a href="https://tlgg.ru/@dev_gesha" target="_blank">-->
+<!--          <custom-icon-->
+<!--            :icon="'fab fa-telegram-plane'"-->
+<!--          ></custom-icon>-->
+<!--        </a>-->
+<!--      </div>-->
+<!--    </div>-->
   </q-footer>
 </template>
 <script>

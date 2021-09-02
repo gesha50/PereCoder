@@ -35,6 +35,8 @@ export default function () {
     associationsForWhiteSecretWords: [[],[],[],[]],
     associationsForBlackSecretWords: [[],[],[],[]],
 
+    chat: [],
+
     whoIsWinner: null,
   }
 }

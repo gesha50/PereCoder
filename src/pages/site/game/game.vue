@@ -50,7 +50,7 @@
     </div>
     <p
       class="inline-block q-mx-lg text-subtitle1 text-weight-bold"
-      v-for="(word, i) in this.$store.getters['socket/FOUR_GAME_WORDS']"
+      v-for="(word, i) in FOUR_GAME_WORDS"
       :key="i"
     >{{word}}</p>
     <div v-if="step === 0">
@@ -75,6 +75,7 @@
                 label="first association"
                 hint="use secret code numbers!!!"
                 :rules="[val => !!val || 'Field is required',
+                      val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[0]-1].indexOf(val)  === -1 ||
                        'You have the same association for this word']"
               />
@@ -84,6 +85,7 @@
                 v-model="secondWord"
                 label="second association"
                 :rules="[val => !!val || 'Field is required',
+                        val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForWhiteSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
               />
@@ -93,6 +95,7 @@
                 v-model="thirdWord"
                 label="third association"
                 :rules="[val => !!val || 'Field is required',
+                      val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
               />
@@ -105,6 +108,7 @@
                 label="first association"
                 hint="use secret code numbers!!!"
                 :rules="[val => !!val || 'Field is required',
+                      val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[0]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
               />
@@ -114,6 +118,7 @@
                 v-model="secondWord"
                 label="second association"
                 :rules="[val => !!val || 'Field is required',
+                        val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForBlackSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
               />
@@ -123,6 +128,7 @@
                 v-model="thirdWord"
                 label="third association"
                 :rules="[val => !!val || 'Field is required',
+                      val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
               />
@@ -535,62 +541,90 @@
           </div>
         </div>
       </div>
-      <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
-        black
-        <div class="q-px-md">
-          <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
-        </div>
-        <div class="q-px-md">
-          <div v-if="currentUser.team==='white'">
-            <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+      <div v-if="allUsers.length>=4" class="bg-deep-orange-1 chat" ref="chatMessage">
+        <div class="q-pa-md  row justify-center">
+          <div v-if="chat.length" style="width: 100%; max-width: 400px">
+            <q-chat-message
+              v-for="(obj, index) in chat"
+              :key="index"
+              :name="me(obj.name)"
+              :text="obj.message"
+              :sent="currentUser.name===obj.name"
+            />
           </div>
           <div v-else>
-            <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
+            no message in chat
           </div>
         </div>
-        <div>
-          <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+        <div class="row no-wrap justify-end items-center">
+          <q-input
+            rounded
+            outlined
+            v-model="message"
+            label="message..."
+          />
+          <q-btn :disable="isBlockSendMessage" class="q-ma-md" round icon="send" @click="sendMessage" />
         </div>
+
       </div>
-      <div
-        class="row"
-        v-if="associationsForBlackSecretWords[0].length ||
+      <div>
+        <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
+          black
+          <div class="q-px-md">
+            <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
+          </div>
+          <div class="q-px-md">
+            <div v-if="currentUser.team==='white'">
+              <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+            </div>
+            <div v-else>
+              <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
+            </div>
+          </div>
+          <div>
+            <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+          </div>
+        </div>
+        <div
+          class="row"
+          v-if="associationsForBlackSecretWords[0].length ||
               associationsForBlackSecretWords[1].length"
-      >
-        <div class="q-mx-sm">
-          1
-          <div
-            v-for="(forFirstSecretWord, i1) in associationsForBlackSecretWords[0]"
-            :key="i1"
-          >
-            {{forFirstSecretWord}}
+        >
+          <div class="q-mx-sm">
+            1
+            <div
+              v-for="(forFirstSecretWord, i1) in associationsForBlackSecretWords[0]"
+              :key="i1"
+            >
+              {{forFirstSecretWord}}
+            </div>
           </div>
-        </div>
-        <div class="q-mx-sm">
-          2
-          <div
-            v-for="(forSecondSecretWord, i2) in associationsForBlackSecretWords[1]"
-            :key="i2"
-          >
-            {{forSecondSecretWord}}
+          <div class="q-mx-sm">
+            2
+            <div
+              v-for="(forSecondSecretWord, i2) in associationsForBlackSecretWords[1]"
+              :key="i2"
+            >
+              {{forSecondSecretWord}}
+            </div>
           </div>
-        </div>
-        <div class="q-mx-sm">
-          3
-          <div
-            v-for="(forThirdSecretWord, i3) in associationsForBlackSecretWords[2]"
-            :key="i3"
-          >
-            {{forThirdSecretWord}}
+          <div class="q-mx-sm">
+            3
+            <div
+              v-for="(forThirdSecretWord, i3) in associationsForBlackSecretWords[2]"
+              :key="i3"
+            >
+              {{forThirdSecretWord}}
+            </div>
           </div>
-        </div>
-        <div class="q-mx-sm">
-          4
-          <div
-            v-for="(forFoursSecretWord, i4) in associationsForBlackSecretWords[3]"
-            :key="i4"
-          >
-            {{forFoursSecretWord}}
+          <div class="q-mx-sm">
+            4
+            <div
+              v-for="(forFoursSecretWord, i4) in associationsForBlackSecretWords[3]"
+              :key="i4"
+            >
+              {{forFoursSecretWord}}
+            </div>
           </div>
         </div>
       </div>
@@ -609,6 +643,14 @@ export default {
       thirdWord: null,
       isPlayer: false,
       isActive: this.$store.state.socket.user.isActive,
+      message: '',
+    }
+  },
+  watch: {
+    chat() {
+      setTimeout(()=>{
+        this.$refs.chatMessage.scrollTop = this.$refs.chatMessage.scrollHeight
+      })
     }
   },
   beforeUpdate() {
@@ -645,6 +687,27 @@ export default {
         return true
       }
       return false
+    },
+    FOUR_GAME_WORDS () {
+      return this.$store.getters['socket/FOUR_GAME_WORDS']
+    },
+    chat() {
+      return this.$store.getters["socket/chat"]
+    },
+    isBlockSendMessage() {
+      if (this.currentUser.team === 'white') {
+        if (this.step === 4) {
+          return false
+        } else  {
+          return this.currentUser.isActive
+        }
+      } else {
+        if (this.step === 2) {
+          return false
+        } else  {
+          return this.currentUser.isActive
+        }
+      }
     },
     associationsForBlackSecretWords() {
       return this.$store.getters["socket/associationsForBlackSecretWords"]
@@ -740,10 +803,23 @@ export default {
     })
   },
   methods: {
+    me(name) {
+      if (name===this.currentUser.name) {
+        return 'me'
+      }
+      return name
+    },
     startRound() {
       this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
       })
+    },
+    sendMessage() {
+      if (this.message === '') return
+      this.$socket.emit('sendMessage', [this.currentUser, this.message], dataFromServer => {
+        console.log(dataFromServer)
+      })
+      this.message = ''
     },
     finishAndStartRound() {
       this.$socket.emit('isActiveUserFalse', this.currentUser, dataFromServer => {
@@ -869,6 +945,14 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.chat {
+  overflow-y: auto;
+  max-height: 200px;
+  min-width: 300px;
+  &__input{
+    width: 75%;
+    float: right;
+  }
+}
 </style>

@@ -243,7 +243,13 @@ export function  allDataNull (state) {
 
   state.associationsForWhiteSecretWords = [[],[],[],[]]
   state.associationsForBlackSecretWords = [[],[],[],[]]
+  state.chat = []
 
   state.whoIsWinner = null
+}
+
+export function  SOCKET_sendMessage (state, data) {
+  console.log('SOCKET_sendMessage')
+  state.chat.push(data)
 }
 

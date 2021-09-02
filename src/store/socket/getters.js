@@ -120,3 +120,7 @@ export function associationsForWhiteSecretWords (state) {
 export function associationsForBlackSecretWords (state) {
   return state.associationsForBlackSecretWords
 }
+
+export function chat (state) {
+  return state.chat
+}
