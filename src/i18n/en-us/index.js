@@ -1,14 +1,13 @@
 export default {
-  menu: {
-    index: 'Home',
+  index: {
+    welcome: 'Welcome to Perecoder!',
   },
   btn: {
-    talk: 'Let`s talk',
-    more: 'Explore More',
+    newGame: 'New game',
+    joinToGame: 'join to game',
+    setting: 'setting',
+    rules: 'rules',
     submit: 'Submit',
     reset: 'reset',
   },
-  footer: {
-    text: 'Let’s be Friends'
-  }
 }

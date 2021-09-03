@@ -209,6 +209,19 @@ export function  SOCKET_listGameBlackSide (state, data) {
 }
 
 export function  allDataNull (state) {
+ end(state)
+}
+
+export function  SOCKET_sendMessage (state, data) {
+  console.log('SOCKET_sendMessage')
+  state.chat.push(data)
+}
+
+export function  SOCKET_allDataNull (state) {
+  end(state)
+}
+
+function end(state) {
   state.ROUND = 0
   state.user = null
   state.users = []
@@ -246,10 +259,5 @@ export function  allDataNull (state) {
   state.chat = []
 
   state.whoIsWinner = null
-}
-
-export function  SOCKET_sendMessage (state, data) {
-  console.log('SOCKET_sendMessage')
-  state.chat.push(data)
 }
 

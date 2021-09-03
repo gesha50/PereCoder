@@ -7,12 +7,26 @@
       </q-avatar>
       <q-space></q-space>
       <q-btn
+        v-if="currentRoutePath !== '/'"
         class="q-mx-lg"
         label="Home"
-        @click="goHome"
+        @click="confirm = true"
       />
       <q-select  @input="changedLang(lang)" filled v-model="lang" :options="options" />
     </q-toolbar>
+    <q-dialog v-model="confirm" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="warning" color="red" text-color="white" />
+          <span class="q-ml-sm">You are really go out from game?</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Go Home" color="red" v-close-popup @click="goHome" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-header>
 </template>
 
@@ -21,6 +35,7 @@ export default {
   name: "TopHeader",
   data() {
     return {
+      confirm: false,
       tab: '',
       lang: this.$store.getters["header/getLang"],
       options: [
@@ -34,6 +49,11 @@ export default {
   },
   updated() {
     this.$i18n.locale = this.lang
+  },
+  computed: {
+    currentRoutePath() {
+      return this.$route.path;
+    }
   },
   methods: {
     changedLang(val) {

@@ -1,11 +1,22 @@
 <template>
-  <q-page padding>
-    <h1>newGame</h1>
-    <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" dense />
-    <q-input class="q-mb-md" filled v-model="players" label="How much players?" dense />
-    <p>room: {{room}}</p>
-    <q-btn label="play" @click="newGame" />
-  </q-page>
+  <q-card
+    class="login-form"
+    :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+  >
+    <q-img src="/statics/images/label_4.png"></q-img>
+    <div class="row justify-around no-wrap items-center">
+      <div class="text-h6 ellipsis text-center">
+        New game
+      </div>
+      <div>room: <strong>{{room}}</strong></div>
+    </div>
+    <q-card-section class="column">
+      <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" color="accent" dense />
+      <q-input class="q-mb-md" filled v-model="players" label="How much players?" color="accent" dense />
+      <q-btn :disable="!(players>=4 && players<=12)" color="accent" label="play" @click="newGame" />
+      <div class="text-accent" v-if="!(players>=4 && players<=12)">You need players from 4 to 12</div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script>

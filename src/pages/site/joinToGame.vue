@@ -1,10 +1,21 @@
 <template>
-  <q-page padding>
-    <h1>joinToGame</h1>
-    <q-input class="q-mb-md" filled v-model="nickname" label="Nickname" dense />
-    <q-input class="q-mb-md" filled v-model="room" label="Room number" dense />
-    <q-btn label="GO" @click="goToRegistration" />
-  </q-page>
+  <q-card
+    class="login-form"
+    :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+  >
+    <q-img src="/statics/images/label_4.png"></q-img>
+    <div class="no-wrap items-center">
+      <div class="text-h6 ellipsis text-center">
+        Join to game
+      </div>
+    </div>
+    <q-card-section class="column">
+      <q-input class="q-mb-md" filled v-model="nickname" color="accent" label="Nickname" dense />
+      <q-input class="q-mb-md" filled v-model="room" color="accent" label="Room number" dense />
+      <q-btn :disable="isCorrect" color="accent" label="GO" @click="goToRegistration" />
+      <div class="text-accent">{{error}}</div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script>
@@ -14,8 +25,24 @@ export default {
   name: "joinToGame",
   data() {
     return {
+      error: '',
       nickname: '',
       room: null,
+    }
+  },
+  computed: {
+    isCorrect() {
+      if (this.nickname) {
+        if (this.room) {
+          return false
+        } else {
+          this.error = 'Please write room number'
+          return true
+        }
+      } else {
+        this.error = 'Please write nickname'
+        return true
+      }
     }
   },
   methods: {

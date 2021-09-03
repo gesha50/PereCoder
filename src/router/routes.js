@@ -2,12 +2,17 @@
 const routes = [
   { path: '/', component: () => import('layouts/MainLayouts'),
     children: [
-      { path: '', component: () => import('pages/site/index') },
-      { path: 'new', component: () => import('pages/site/newGame') },
-      { path: 'join', component: () => import('pages/site/joinToGame') },
-      { path: 'setting', component: () => import('pages/site/setting') },
-      { path: 'rules', component: () => import('pages/site/rules') },
-      { path: '/register-game/:room', component: () => import('pages/site/registerGame.vue') },
+      { path: '',
+        component: () => import('pages/site/index'),
+        children: [
+          { path: 'new', component: () => import('pages/site/newGame') },
+          { path: 'join', component: () => import('pages/site/joinToGame') },
+          { path: 'setting', component: () => import('pages/site/setting') },
+          { path: 'rules', component: () => import('pages/site/rules') },
+          { path: '/register-game/:room', component: () => import('pages/site/registerGame.vue') },
+          { path: '', component: () => import('pages/site/default') },
+        ]
+      },
       { path: 'game', component: () => import('pages/site/game/game') },
       { path: 'finish', component: () => import('pages/site/game/finish') },
 

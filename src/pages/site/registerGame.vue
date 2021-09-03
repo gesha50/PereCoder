@@ -15,7 +15,8 @@
       <q-btn label="white" color="white" text-color="black" @click="setUserTeam({team: 'white', user: user, i})" />
       <q-btn label="black" color="black" @click="setUserTeam({team: 'black', user: user, i})" />
     </q-card>
-    <q-btn label="start game!" color="green" @click="startGame" />
+    <q-btn v-if="currentUser.isOrganizer" label="start game!" color="green" @click="startGame" />
+    <p v-if="message">{{message}}</p>
 
     <q-btn color="red" label="who are you?" @click="getId" />
 
@@ -36,6 +37,7 @@ export default {
   data() {
     return {
       color: 'white',
+      message: '',
     }
   },
   computed: {
@@ -70,9 +72,13 @@ export default {
       })
     },
     startGame() {
-      this.$socket.emit('startGame', this.currentUser, dataFromServer => {
-        console.log(dataFromServer)
-      })
+      if (this.currentUser.players === this.allUsers.length) {
+        this.$socket.emit('startGame', this.currentUser, dataFromServer => {
+          console.log(dataFromServer)
+        })
+      } else {
+        this.message = `You need ${this.currentUser.players} players to start game. But now only ${this.allUsers.length}`
+      }
     },
     redirect(){
       this.$router.push('/game')

@@ -125,7 +125,7 @@ import { mapGetters } from 'vuex'
     }
 </script>
 
-<style>
+<style scoped>
 #particles-js {
   position: absolute;
   width: 100%;

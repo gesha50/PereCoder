@@ -1,14 +1,13 @@
 export default {
-  menu: {
-    index: 'Главная',
+  index: {
+    welcome: 'Perecoder',
   },
   btn: {
-    talk: 'Оставь заявку',
-    more: 'Больше',
+    newGame: 'Новая игра',
+    joinToGame: 'зайти в игру',
+    setting: 'настройки',
+    rules: 'правила',
     submit: 'Отправить',
     reset: 'сброс',
   },
-  footer: {
-    text: 'Со мной можно связаться:'
-  }
 }
