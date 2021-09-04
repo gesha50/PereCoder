@@ -1,26 +1,38 @@
 <template>
-  <q-page padding>
-    <h1>registerGame</h1>
-    <p>{{isGame}}</p>
-    <p>капитан распределяет игроков на команды</p>
-    <q-card
-      class="bg-light-blue-3 q-mb-md"
+  <q-card
+    class="login-form"
+    :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+  >
+    <div class="no-wrap items-center">
+      <div class="text-h6 ellipsis text-center">
+        Register Game
+      </div>
+      room: {{currentUser.room}}
+      <p>капитан распределяет игроков на команды</p>
+    </div>
+    <div class="row">
+      <q-card
+      class="user q-ma-sm"
+      :class="user.team"
       v-for="(user, i) in allUsers"
       :key="i"
     >
-      {{i+1}}
-      <p>{{user.name}}</p>
-      <p>{{user.id}}</p>
-      <p>Your team: {{user.team}}</p>
-      <q-btn label="white" color="white" text-color="black" @click="setUserTeam({team: 'white', user: user, i})" />
-      <q-btn label="black" color="black" @click="setUserTeam({team: 'black', user: user, i})" />
+    <q-card-section class="q-ma-sm">
+      <div class="text-h6">{{user.name}}</div>
+      <div class="text-subtitle2">Your team: {{user.team}}</div>
+      <div class="row justify-around" v-if="currentUser.isOrganizer">
+        <q-btn label="white" color="white" text-color="black" @click="setUserTeam({team: 'white', user: user, i})" />
+        <q-btn label="black" color="black" @click="setUserTeam({team: 'black', user: user, i})" />
+      </div>
+    </q-card-section>
     </q-card>
-    <q-btn v-if="currentUser.isOrganizer" label="start game!" color="green" @click="startGame" />
-    <p v-if="message">{{message}}</p>
-
-    <q-btn color="red" label="who are you?" @click="getId" />
-
-  </q-page>
+    </div>
+    <q-card-section class="column">
+      <q-btn v-if="currentUser.isOrganizer" label="start game!" color="green" @click="startGame" />
+      <p v-if="message">{{message}}</p>
+    </q-card-section>
+  </q-card>
+<!--    <q-btn color="red" label="who are you?" @click="getId" />-->
 </template>
 
 <script>
@@ -92,6 +104,16 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.user {
+  width: 44%;
+}
+.black {
+  background: $dark;
+  color: $grey-1;
+}
+.white {
+  background: $grey-1;
+  color: $dark;
+}
 </style>

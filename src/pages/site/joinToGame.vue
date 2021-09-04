@@ -34,6 +34,7 @@ export default {
     isCorrect() {
       if (this.nickname) {
         if (this.room) {
+          this.error = ''
           return false
         } else {
           this.error = 'Please write room number'

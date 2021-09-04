@@ -13,7 +13,7 @@
     <q-card-section class="column">
       <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" color="accent" dense />
       <q-input class="q-mb-md" filled v-model="players" label="How much players?" color="accent" dense />
-      <q-btn :disable="!(players>=4 && players<=12)" color="accent" label="play" @click="newGame" />
+      <q-btn :disable="(!(players>=4 && players<=12)) || !nickname.length" color="accent" label="play" @click="newGame" />
       <div class="text-accent" v-if="!(players>=4 && players<=12)">You need players from 4 to 12</div>
     </q-card-section>
   </q-card>
