@@ -76,7 +76,8 @@ io.on("connection", socket => {
     while (isRoomExist(client, room)) {
       isRoomExist(client, room)
     }
-    client.set(`room:${room}`, room, 'ex', 60 * 60 * 2, redis.print)
+    client.set(`room:${room}`, redis.print)
+    client.expire(`room:${room}`, 'ex', 60 * 60 * 2)
     cbToClient(room)
   })
 
@@ -118,7 +119,8 @@ io.on("connection", socket => {
       isOrganizer: data.isOrganizer
     }
     if (data.isOrganizer) {
-      client.set(`room:${data.room}:players`, data.players.toString(), 'ex', 60 * 60 * 2)
+      client.set(`room:${data.room}:players`, data.players.toString())
+      client.expire(`room:${data.room}:players`, 'ex', 60 * 60 * 2)
     }
     let isRoomFull = false
     if (!data.isOrganizer) {
@@ -150,10 +152,11 @@ io.on("connection", socket => {
                   'players', user.players,
                   'isOrganizer', user.isOrganizer,
                   'isActive', false,
-                  'ex', 60 * 60 * 2,
                   function(err, res) {
                     if (err) console.log(err)
-                    client.set(`room:${data.room}:user:${socket.id}`, socket.id, 'ex', 60 * 60 * 2, redis.print)
+                    client.expire(socket.id, 'ex', 60 * 60 * 2)
+                    client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
+                    client.expire(`room:${data.room}:user:${socket.id}`, 'ex', 60 * 60 * 2)
                     socket.join(data.room)
                     users.getAllUsers(`room:${data.room}:user:*`, data.room, io)
                     cb(user)
@@ -176,10 +179,11 @@ io.on("connection", socket => {
         'players', user.players,
         'isOrganizer', user.isOrganizer,
         'isActive', false,
-        'ex', 60 * 60 * 2,
         function (err, res) {
           if (err) console.log(err)
-          client.set(`room:${data.room}:user:${socket.id}`, socket.id, 'ex', 60 * 60 * 2, redis.print)
+          client.expire(socket.id, 'ex', 60 * 60 * 2)
+          client.set(`room:${data.room}:user:${socket.id}`, socket.id, redis.print)
+          client.expire(`room:${data.room}:user:${socket.id}`, 'ex', 60 * 60 * 2)
           socket.join(data.room)
           io.to(data.room).emit('updateUsers', user)
           cb(user)
@@ -197,9 +201,9 @@ io.on("connection", socket => {
       'players', dataFromClient.players ? dataFromClient.players : 0,
       'isOrganizer', dataFromClient.user.isOrganizer,
       'isActive', false,
-      'ex', 60 * 60 * 2,
       function(err, res) {
         if (err) console.log(err)
+        client.expire(dataFromClient.user.id, 'ex', 60 * 60 * 2)
         cbToClient(dataFromClient.team)
         io.to(dataFromClient.user.room).emit('setTeam', dataFromClient.team, dataFromClient.i)
         io.to(dataFromClient.user.id).emit('setPersonalTeam', dataFromClient.team)
@@ -212,7 +216,8 @@ io.on("connection", socket => {
 
   socket.on('startGame', (dataFromClient, cbToClient) =>{
     isGameRun = true
-    client.set(`room:${dataFromClient.room}:game-status`, isGameRun, 'ex', 60 * 60 * 2, redis.print)
+    client.set(`room:${dataFromClient.room}:game-status`, isGameRun, redis.print)
+    client.expire(`room:${dataFromClient.room}:game-status`, 'ex', 60 * 60 * 2)
     let i=0
     let uniqueIndexForDictionary = []
     while (i<8) {
@@ -236,8 +241,10 @@ io.on("connection", socket => {
         FOUR_WORDS_BLACK.push(DICTIONARY_CLASSIC[uniqueIndexForDictionary[i]])
       }
     }
-    client.set('FOUR_WORDS_WHITE', JSON.stringify(FOUR_WORDS_WHITE), 'ex', 60 * 60 * 2, redis.print)
-    client.set('FOUR_WORDS_BLACK', JSON.stringify(FOUR_WORDS_BLACK), 'ex', 60 * 60 * 2, redis.print)
+    client.set('FOUR_WORDS_WHITE', JSON.stringify(FOUR_WORDS_WHITE), redis.print)
+    client.set('FOUR_WORDS_BLACK', JSON.stringify(FOUR_WORDS_BLACK), redis.print)
+    client.expire('FOUR_WORDS_WHITE', 'ex', 60 * 60 * 2)
+    client.expire('FOUR_WORDS_BLACK', 'ex', 60 * 60 * 2)
 
     io.to(dataFromClient.room).emit('setGameStatus', isGameRun, ROUND)
     cbToClient('ok')
@@ -277,16 +284,17 @@ io.on("connection", socket => {
 
   socket.on('startRound', (dataFromClient, cbToClient) => {
     if (dataFromClient[1].team === 'white') {
-      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
       isWhiteBtnPress = true
     } else {
-      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
       isBlackBtnPress = true
     }
     if (isWhiteBtnPress && isBlackBtnPress) {
       console.log('start')
       ROUND++
-      client.set(`room:${dataFromClient[0][0].room}:roundNumber`, ROUND, 'ex', 60 * 60 * 2)
+      client.set(`room:${dataFromClient[0][0].room}:roundNumber`, ROUND)
+      client.expire(`room:${dataFromClient[0][0].room}:roundNumber`, 'ex', 60 * 60 * 2)
       io.to(dataFromClient[0][0].room).emit('setRound', ROUND)
 
       isBlackBtnPress = false
@@ -312,9 +320,9 @@ io.on("connection", socket => {
             'players', activeUser.players,
             'isOrganizer', activeUser.isOrganizer,
             'isActive', true,
-            'ex', 60 * 60 * 2,
             function(err, res) {
               if (err) console.log(err)
+              client.expire(keys[whiteActiveIndex], 'ex', 60 * 60 * 2)
               console.log(res)
               let multi = client.multi()
               keys.forEach(whiteUser =>{
@@ -327,7 +335,10 @@ io.on("connection", socket => {
                     let threeCorrectSecretNumbers = getThreeNumbers()
                     client.set(
                       `room:${dataFromClient[0][0].room}:team:white:round:${ROUND}:threeCorrectSecretNumbers`,
-                      JSON.stringify(threeCorrectSecretNumbers), 'ex', 60 * 60 * 2)
+                      JSON.stringify(threeCorrectSecretNumbers))
+                    client.expire(
+                      `room:${dataFromClient[0][0].room}:team:white:round:${ROUND}:threeCorrectSecretNumbers`,
+                      'ex', 60 * 60 * 2)
                     io.to(whUser.id).emit('threeNumbers', threeCorrectSecretNumbers)
                   }
                 })
@@ -354,9 +365,9 @@ io.on("connection", socket => {
             'players', activeUser.players,
             'isOrganizer', activeUser.isOrganizer,
             'isActive', true,
-            'ex', 60 * 60 * 2,
             function(err, res) {
               if (err) console.log(err)
+              client.expire(keys[blackActiveIndex], 'ex', 60 * 60 * 2)
               console.log(res)
               let multi = client.multi()
               keys.forEach(blackUser =>{
@@ -369,7 +380,11 @@ io.on("connection", socket => {
                     let threeCorrectSecretNumbers = getThreeNumbers()
                     client.set(
                       `room:${dataFromClient[0][0].room}:team:black:round:${ROUND}:threeCorrectSecretNumbers`,
-                      JSON.stringify(threeCorrectSecretNumbers), 'ex', 60 * 60 * 2)
+                      JSON.stringify(threeCorrectSecretNumbers))
+                    client
+                      .expire(
+                        `room:${dataFromClient[0][0].room}:team:black:round:${ROUND}:threeCorrectSecretNumbers`,
+                        'ex', 60 * 60 * 2)
                     io.to(blUser.id).emit('threeNumbers', threeCorrectSecretNumbers)
                   }
                 })
@@ -394,7 +409,7 @@ io.on("connection", socket => {
 
   socket.on('readyThreeWords', (dataFromClient, cbToClient) => {
     if (dataFromClient[1].team === 'white') {
-      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
       client.zadd(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:association`,
         1, dataFromClient[0][0],
         2, dataFromClient[0][1],
@@ -402,7 +417,7 @@ io.on("connection", socket => {
       client.expire(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:association`, 60*60*2)
       isWhiteBtnPress = true
     } else {
-      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
       client.zadd(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:association`,
         1, dataFromClient[0][0],
         2, dataFromClient[0][1],
@@ -459,11 +474,13 @@ io.on("connection", socket => {
     client.get(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:threeCorrectSecretNumbers`,
       function (e, threeCorrectSecretNumbers) {
         if (dataFromClient[1].team === 'white') {
-          // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+          // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
           isWhiteBtnPress = true
           client.set(
             `room:${dataFromClient[1].room}:team:white:round:${ROUND}:threeTryToGuessNumbers`,
-            dataFromClient[0], 'ex', 60 * 60 * 2)
+            dataFromClient[0])
+          client.expire(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:threeTryToGuessNumbers`,
+                        'ex', 60 * 60 * 2)
           if (threeCorrectSecretNumbers === dataFromClient[0]) {
             isTryWhiteToGuessCorrect = true
           } else  {
@@ -471,15 +488,19 @@ io.on("connection", socket => {
             whiteCounterHindrance++
           }
           client.set(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`,
-            isTryWhiteToGuessCorrect, 'ex', 60 * 60 * 2)
+            isTryWhiteToGuessCorrect)
+          client.expire(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, 'ex', 60 * 60 * 2)
           client.set(`room:${dataFromClient[1].room}:team:white:whiteCounterHindrance`,
-            whiteCounterHindrance, 'ex', 60 * 60 * 2)
+            whiteCounterHindrance)
+          client.expire(`room:${dataFromClient[1].room}:team:white:whiteCounterHindrance`, 'ex', 60 * 60 * 2)
         } else {
-          // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+          // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
           isBlackBtnPress = true
           client.set(
             `room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeTryToGuessNumbers`,
-            dataFromClient[0], 'ex', 60 * 60 * 2)
+            dataFromClient[0])
+          client.expire(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeTryToGuessNumbers`,
+                        'ex', 60 * 60 * 2)
           if (threeCorrectSecretNumbers === dataFromClient[0]) {
             isTryBlackToGuessCorrect = true
             blackCounterInterception++
@@ -487,9 +508,11 @@ io.on("connection", socket => {
             isTryBlackToGuessCorrect = false
           }
           client.set(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`,
-            isTryBlackToGuessCorrect, 'ex', 60 * 60 * 2)
+            isTryBlackToGuessCorrect)
+          client.expire(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, 'ex', 60 * 60 * 2)
           client.set(`room:${dataFromClient[1].room}:team:black:blackCounterInterception`,
-            blackCounterInterception, 'ex', 60 * 60 * 2)
+            blackCounterInterception)
+          client.expire(`room:${dataFromClient[1].room}:team:black:blackCounterInterception`, 'ex', 60 * 60 * 2)
         }
         if (isWhiteBtnPress && isBlackBtnPress) {
           isBlackBtnPress = false
@@ -531,10 +554,10 @@ io.on("connection", socket => {
 
   socket.on('nextThreeWords', (dataFromClient, cbToClient) => {
     if (dataFromClient.team === 'white') {
-      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
       isWhiteBtnPress = true
     } else {
-      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+      // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
       isBlackBtnPress = true
     }
     if (isWhiteBtnPress && isBlackBtnPress) {
@@ -566,11 +589,13 @@ io.on("connection", socket => {
     client.get(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:threeCorrectSecretNumbers`,
       function (e, threeCorrectSecretNumbers) {
         if (dataFromClient[1].team === 'white') {
-          // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+          // client.set(`room:${dataFromClient[0][0].room}:isWhiteBtnPress`, 'true', redis.print)
           isWhiteBtnPress = true
           client.set(
             `room:${dataFromClient[1].room}:team:white:round:${ROUND}:tryToGuessBlackNumbers`,
-            dataFromClient[0], 'ex', 60 * 60 * 2)
+            dataFromClient[0])
+          client.expire(`room:${dataFromClient[1].room}:team:white:round:${ROUND}:tryToGuessBlackNumbers`,
+                        'ex', 60 * 60 * 2)
           if (threeCorrectSecretNumbers === dataFromClient[0]) {
             isTryWhiteToGuessCorrect = true
             whiteCounterInterception++
@@ -578,15 +603,19 @@ io.on("connection", socket => {
             isTryWhiteToGuessCorrect = false
           }
           client.set(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`,
-            isTryWhiteToGuessCorrect, 'ex', 60 * 60 * 2)
+            isTryWhiteToGuessCorrect)
+          client.expire(`room:${dataFromClient[1].room}:team:white:isTryToGuessCorrect`, 'ex', 60 * 60 * 2)
           client.set(`room:${dataFromClient[1].room}:team:white:whiteCounterInterception`,
-            whiteCounterInterception, 'ex', 60 * 60 * 2)
+            whiteCounterInterception)
+          client.expire(`room:${dataFromClient[1].room}:team:white:whiteCounterInterception`, 'ex', 60 * 60 * 2)
         } else {
-          // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', 'ex', 60 * 60 * 2, redis.print)
+          // client.set(`room:${dataFromClient[0][0].room}:isBlackBtnPress`, 'true', redis.print)
           isBlackBtnPress = true
           client.set(
             `room:${dataFromClient[1].room}:team:black:round:${ROUND}:tryToGuessBlackNumbers`,
-            dataFromClient[0], 'ex', 60 * 60 * 2)
+            dataFromClient[0])
+          client.expire(`room:${dataFromClient[1].room}:team:black:round:${ROUND}:tryToGuessBlackNumbers`,
+                        'ex', 60 * 60 * 2)
           if (threeCorrectSecretNumbers === dataFromClient[0]) {
             isTryBlackToGuessCorrect = true
           } else {
@@ -594,9 +623,11 @@ io.on("connection", socket => {
             blackCounterHindrance++
           }
           client.set(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`,
-            isTryBlackToGuessCorrect, 'ex', 60 * 60 * 2)
+            isTryBlackToGuessCorrect)
+          client.expire(`room:${dataFromClient[1].room}:team:black:isTryToGuessCorrect`, 'ex', 60 * 60 * 2)
           client.set(`room:${dataFromClient[1].room}:team:black:blackCounterHindrance`,
-            blackCounterHindrance, 'ex', 60 * 60 * 2)
+            blackCounterHindrance)
+          client.expire(`room:${dataFromClient[1].room}:team:black:blackCounterHindrance`, 'ex', 60 * 60 * 2)
         }
         if (isWhiteBtnPress && isBlackBtnPress) {
           isBlackBtnPress = false
@@ -623,13 +654,16 @@ io.on("connection", socket => {
                       if (finishGame) {
                         endGame()
                         if (finishGame === 'blackWin') {
-                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black', 'ex', 60 * 60 * 2)
-                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'black', 'ex', 60 * 60 * 2)
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black')
+                          client.expire(`room:${dataFromClient[1].room}:whoIsWinner`,'ex', 60 * 60 * 2)
+                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'black')
                         } else if (finishGame === 'whiteWin') {
-                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'white', 'ex', 60 * 60 * 2)
-                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'white', 'ex', 60 * 60 * 2)
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'white')
+                          client.expire(`room:${dataFromClient[1].room}:whoIsWinner`,'ex', 60 * 60 * 2)
+                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'white')
                         } else {
-                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'superRound', 'ex', 60 * 60 * 2)
+                          client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'superRound')
+                          client.expire(`room:${dataFromClient[1].room}:whoIsWinner`,'ex', 60 * 60 * 2)
                         }
                       }
                       console.log(finishGame)
@@ -672,8 +706,8 @@ io.on("connection", socket => {
         'team', activeUser.team,
         'players', activeUser.players,
         'isOrganizer', activeUser.isOrganizer,
-        'isActive', false,
-        'ex', 60 * 60 * 2)
+        'isActive', false)
+      client.expire(activeUser.id,'ex', 60 * 60 * 2)
     })
     console.log('finish')
     users.getAllUsers(`room:${dataFromClient[1].room}:user:*`, dataFromClient[1].room, io)

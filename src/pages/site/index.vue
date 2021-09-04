@@ -1,9 +1,10 @@
 <template>
   <q-page class="flex flex-center">
-    <div
-      id="particles-js"
+    <Particles
       :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
-    ></div>
+      id="particles-js"
+      :options="getStyle"
+    />
     <q-btn
       color="white"
       class="absolute-top-right"
@@ -39,9 +40,6 @@
 </template>
 
 <script>
-
-import {mapGetters} from "vuex";
-
 export default {
   name: "index",
   data() {
@@ -78,16 +76,13 @@ export default {
     },
   },
   computed:{
-    ...mapGetters({
-      getStyle: 'style/getStyle',
-    }),
+    getStyle() {
+      return this.$store.getters['style/getStyle']
+    },
     currentRoutePath() {
       return this.$route.path;
     }
   },
-  mounted() {
-    particlesJS("particles-js", this.getStyle);
-  }
 }
 </script>
 

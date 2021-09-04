@@ -9,6 +9,7 @@ module.exports = function (ctx) {
     boot: [
       'i18n',
       'vue-socket.io',
+      'practicles.vue',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

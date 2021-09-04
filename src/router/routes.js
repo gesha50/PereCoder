@@ -10,12 +10,11 @@ const routes = [
           { path: 'setting', component: () => import('pages/site/setting') },
           { path: 'rules', component: () => import('pages/site/rules') },
           { path: '/register-game/:room', component: () => import('pages/site/registerGame.vue') },
+          { path: 'game', component: () => import('pages/site/game/game') },
           { path: '', component: () => import('pages/site/default') },
         ]
       },
-      { path: 'game', component: () => import('pages/site/game/game') },
       { path: 'finish', component: () => import('pages/site/game/finish') },
-
     ]
   },
 

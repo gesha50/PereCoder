@@ -2,10 +2,11 @@
   <q-layout>
     <q-page-container>
       <q-page class="flex flex-center">
-        <div
-          id="particles-js"
+        <Particles
           :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
-        ></div>
+          id="particles-js"
+          :options="getStyle"
+        />
         <q-btn
           color="white"
           class="absolute-top-right"
@@ -119,9 +120,6 @@ import { mapGetters } from 'vuex'
                })
            }
          },
-        mounted() {
-            particlesJS("particles-js", this.getStyle);
-        }
     }
 </script>
 
