@@ -73,6 +73,7 @@ export default {
     goHome() {
       this.$store.dispatch('socket/allDataNull')
       this.$router.push('/')
+      location.reload()
     },
   },
   computed:{

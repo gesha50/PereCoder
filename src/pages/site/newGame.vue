@@ -11,8 +11,8 @@
       <div>room: <strong>{{room}}</strong></div>
     </div>
     <q-card-section class="column">
-      <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" color="accent" dense />
-      <q-input class="q-mb-md" filled v-model="players" label="How much players?" color="accent" dense />
+      <q-input class="q-mb-md" filled v-model="nickname" label="Your nickname" color="accent" dense ref="nickname" />
+      <q-input class="q-mb-md" filled v-model="players" label="How much players?" color="accent" dense @keyup.enter="newGame" />
       <q-btn :disable="(!(players>=4 && players<=12)) || !nickname.length" color="accent" label="play" @click="newGame" />
       <div class="text-accent" v-if="!(players>=4 && players<=12)">You need players from 4 to 12</div>
     </q-card-section>
@@ -36,11 +36,15 @@ export default {
       console.log(dataFromServer)
       this.room = dataFromServer
     })
+    this.focusInput()
   },
   methods: {
     ...mapActions({
       setUser: 'socket/setUser'
     }),
+    focusInput() {
+      this.$refs['nickname'].focus()
+    },
     newGame() {
       // this.$socket.emit('test', dataToServer, dataFromServer => {})
 

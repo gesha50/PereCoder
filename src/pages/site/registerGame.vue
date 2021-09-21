@@ -3,6 +3,7 @@
     class="login-form"
     :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
   >
+    <p style="display: none">{{isGameRun}}</p>
     <div class="no-wrap items-center">
       <div class="text-h6 ellipsis text-center">
         Register Game
@@ -59,12 +60,20 @@ export default {
     allUsers() {
       return this.$store.getters["socket/users"]
     },
-    isGame() {
+    isGameRun() {
       return this.$store.getters["socket/isGameRun"]
     }
   },
+  update() {
+    console.log('update')
+    if (this.isGameRun) {
+      this.redirect()
+    }
+  },
   beforeUpdate() {
-    if (this.isGame) {
+    console.log(this.isGameRun)
+    if (this.isGameRun) {
+      console.log(this.isGameRun)
       this.redirect()
     }
   },

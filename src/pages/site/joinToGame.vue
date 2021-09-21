@@ -10,8 +10,8 @@
       </div>
     </div>
     <q-card-section class="column">
-      <q-input class="q-mb-md" filled v-model="nickname" color="accent" label="Nickname" dense />
-      <q-input class="q-mb-md" filled v-model="room" color="accent" label="Room number" dense />
+      <q-input class="q-mb-md" filled v-model="nickname" color="accent" label="Nickname" dense ref="nickname" />
+      <q-input class="q-mb-md" filled v-model="room" color="accent" label="Room number" dense @keyup.enter="goToRegistration" />
       <q-btn :disable="isCorrect" color="accent" label="GO" @click="goToRegistration" />
       <div class="text-accent">{{error}}</div>
     </q-card-section>
@@ -46,10 +46,16 @@ export default {
       }
     }
   },
+  mounted() {
+    this.focusInput()
+  },
   methods: {
     ...mapActions({
       setUser: 'socket/setUser'
     }),
+    focusInput() {
+      this.$refs['nickname'].focus()
+    },
     goToRegistration() {
       this.$socket.emit('registerNewGame', {
         name: this.nickname,
