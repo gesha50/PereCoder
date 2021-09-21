@@ -1,63 +1,73 @@
 <template>
-  <q-page padding>
-    <div class="q-card bg-white">Your team: {{currentUser.team}}
-      <div>name: {{currentUser.name}}</div>
-      <div v-if="step > 0" >Round # {{roundNumber}}</div>
-      <div v-if="currentUser.team === 'white'">
-        <div>
-          <div v-if="whiteCounterHindrance===1">
-            <p class="bg-dark">x</p>
+  <div>
+    <div class="row justify-between no-wrap">
+      <div class="q-card bg-white q-ma-lg q-pa-sm">Your team: {{currentUser.team}}
+        <div>name: {{currentUser.name}}</div>
+        <div v-if="step > 0" >Round # {{roundNumber}}</div>
+        <div v-if="currentUser.team === 'white'">
+          <div>
+            <div v-if="whiteCounterHindrance===1">
+              <p class="bg-dark">x</p>
+            </div>
+            <div v-else-if="whiteCounterHindrance===2">
+              <p class="bg-dark">x</p>
+              <p class="bg-dark">x</p>
+            </div>
+            <div v-else></div>
           </div>
-          <div v-else-if="whiteCounterHindrance===2">
-            <p class="bg-dark">x</p>
-            <p class="bg-dark">x</p>
+          <div>
+            <div v-if="whiteCounterInterception===1">
+              <p class="bg-yellow-1">v</p>
+            </div>
+            <div v-if="whiteCounterInterception===2">
+              <p class="bg-yellow-1">v</p>
+              <p class="bg-yellow-1">v</p>
+            </div>
+            <div v-else></div>
           </div>
-          <div v-else></div>
         </div>
-        <div>
-          <div v-if="whiteCounterInterception===1">
-            <p class="bg-yellow-1">v</p>
+        <div v-else>
+          <div>
+            <div v-if="blackCounterHindrance===1">
+              <p class="bg-dark">x</p>
+            </div>
+            <div v-else-if="blackCounterHindrance===2">
+              <p class="bg-dark">x</p>
+              <p class="bg-dark">x</p>
+            </div>
+            <div v-else></div>
           </div>
-          <div v-if="whiteCounterInterception===2">
-            <p class="bg-yellow-1">v</p>
-            <p class="bg-yellow-1">v</p>
+          <div>
+            <div v-if="blackCounterInterception===1">
+              <p class="bg-yellow-1">v</p>
+            </div>
+            <div v-if="blackCounterInterception===2">
+              <p class="bg-yellow-1">v</p>
+              <p class="bg-yellow-1">v</p>
+            </div>
+            <div v-else></div>
           </div>
-          <div v-else></div>
         </div>
       </div>
-      <div v-else>
-        <div>
-          <div v-if="blackCounterHindrance===1">
-            <p class="bg-dark">x</p>
-          </div>
-          <div v-else-if="blackCounterHindrance===2">
-            <p class="bg-dark">x</p>
-            <p class="bg-dark">x</p>
-          </div>
-          <div v-else></div>
-        </div>
-        <div>
-          <div v-if="blackCounterInterception===1">
-            <p class="bg-yellow-1">v</p>
-          </div>
-          <div v-if="blackCounterInterception===2">
-            <p class="bg-yellow-1">v</p>
-            <p class="bg-yellow-1">v</p>
-          </div>
-          <div v-else></div>
-        </div>
+      <div class="fourGameWords q-card bg-red-12 q-mt-lg row items-center justify-around no-wrap">
+        <div
+          class="inline-block bg-purple-6 q-pa-lg q-ma-lg text-subtitle1 text-weight-bold"
+          v-for="(word, i) in FOUR_GAME_WORDS"
+          :key="i"
+        >{{word}}</div>
       </div>
-    </div>
-    <div class="q-card bg-red q-mt-lg row items-center">
-      <div
-        class="inline-block bg-purple-9 q-pa-lg q-ma-lg text-subtitle1 text-weight-bold"
-        v-for="(word, i) in FOUR_GAME_WORDS"
-        :key="i"
-      >{{word}}</div>
+      <div class="q-card bg-white q-ma-lg q-pa-sm">
+        opponent teem
+      </div>
     </div>
 
-    <div v-if="step === 0">
-        <q-btn :disable="isBtnActive" color="orange" :label="'Start ' + (roundNumber+1) + ' Round'" @click="startRound" />
+    <div class="q-mt-xl flex justify-center" v-if="step === 0">
+        <q-btn
+          :disable="isBtnActive"
+          color="orange"
+          :label="'Start ' + (roundNumber+1) + ' Round'"
+          @click="startRound"
+        />
       {{gameMessage}}
     </div>
     <div v-else-if="step === 1">
@@ -633,7 +643,7 @@
         </div>
       </div>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script>
@@ -950,6 +960,11 @@ export default {
 </script>
 
 <style lang="scss">
+.fourGameWords {
+  width: 80%;
+  margin: 0 auto;
+}
+
 .chatMessage {
   .q-field {
     width: 100%;
@@ -970,6 +985,7 @@ export default {
 }
 
 .chat {
+  border-radius: 10px;
   overflow-y: auto;
   max-height: 250px;
   min-width: 300px;

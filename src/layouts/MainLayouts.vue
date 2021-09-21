@@ -7,8 +7,6 @@
 </template>
 
 <script>
-import TopHeader from "components/header/topHeader";
-import Footer from "components/footer/Footer";
 
 export default {
   name: "MainLayouts",
@@ -20,7 +18,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "src/assets/scss/app.scss";
 
 .q-page-container {

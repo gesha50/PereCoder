@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="">
     <Particles
       :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
       id="particles-js"
@@ -15,11 +15,11 @@
     />
     <q-btn
       v-if="currentRoutePath !== '/'"
-      class="q-mx-lg absolute-bottom-left"
+      class="bg-warning absolute-bottom-left"
       label="Home"
       @click="confirm = true"
     />
-    <div class="absolute-top-left">
+    <div style="border-radius: 10px" class="bg-warning absolute-bottom-right">
         <q-select @input="changedLang(lang)" filled v-model="lang" :options="options" />
     </div>
     <router-view></router-view>
