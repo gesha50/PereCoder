@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div>Your team: {{currentUser.team}}
+    <div class="q-card bg-white">Your team: {{currentUser.team}}
       <div>name: {{currentUser.name}}</div>
       <div v-if="step > 0" >Round # {{roundNumber}}</div>
       <div v-if="currentUser.team === 'white'">
@@ -48,11 +48,14 @@
         </div>
       </div>
     </div>
-    <p
-      class="inline-block q-mx-lg text-subtitle1 text-weight-bold"
-      v-for="(word, i) in FOUR_GAME_WORDS"
-      :key="i"
-    >{{word}}</p>
+    <div class="q-card bg-red q-mt-lg row items-center">
+      <div
+        class="inline-block bg-purple-9 q-pa-lg q-ma-lg text-subtitle1 text-weight-bold"
+        v-for="(word, i) in FOUR_GAME_WORDS"
+        :key="i"
+      >{{word}}</div>
+    </div>
+
     <div v-if="step === 0">
         <q-btn :disable="isBtnActive" color="orange" :label="'Start ' + (roundNumber+1) + ' Round'" @click="startRound" />
       {{gameMessage}}
@@ -541,10 +544,11 @@
           </div>
         </div>
       </div>
-      <div v-if="allUsers.length>=4" class="bg-deep-orange-1 chat" ref="chatMessage">
+      <div v-if="allUsers.length>=4" class="absolute-bottom bg-indigo-8 chat" ref="chatMessage">
         <div class="q-pa-md  row justify-center">
           <div v-if="chat.length" style="width: 100%; max-width: 400px">
             <q-chat-message
+              size="6"
               v-for="(obj, index) in chat"
               :key="index"
               :name="me(obj.name)"
@@ -556,14 +560,14 @@
             no message in chat
           </div>
         </div>
-        <div class="row no-wrap justify-end items-center">
+        <div class="chatMessage bg-white row no-wrap justify-end items-center">
           <q-input
             rounded
             outlined
             v-model="message"
             label="message..."
           />
-          <q-btn :disable="isBlockSendMessage" class="q-ma-md" round icon="send" @click="sendMessage" />
+          <q-btn :disable="isBlockSendMessage" class="q-mx-md" round icon="send" @click="sendMessage" />
         </div>
 
       </div>
@@ -945,11 +949,32 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.chatMessage {
+  .q-field {
+    width: 100%;
+    .q-field__inner {
+      .q-field__control {
+        height: 36px !important;
+        .q-field__control-container {
+          .q-field__label {
+            top: 6px !important;
+          }
+          .q-field__native {
+            padding-top: 20px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
 .chat {
   overflow-y: auto;
-  max-height: 200px;
+  max-height: 250px;
   min-width: 300px;
+  max-width: 500px;
+  margin: 0 auto;
   &__input{
     width: 75%;
     float: right;
