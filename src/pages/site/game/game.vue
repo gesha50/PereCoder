@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="row justify-between no-wrap">
-      <div class="q-card bg-white q-ma-lg q-pa-sm">Your team: {{currentUser.team}}
-        <div>name: {{currentUser.name}}</div>
+      <div class="q-card bg-white q-ma-lg q-pa-sm">Your name: {{currentUser.name}}
+        <div>team: {{currentUser.team}}</div>
         <div v-if="step > 0" >Round # {{roundNumber}}</div>
         <div v-if="currentUser.team === 'white'">
           <div>
@@ -65,108 +65,127 @@
         <q-btn
           :disable="isBtnActive"
           color="orange"
-          :label="'Start ' + (roundNumber+1) + ' Round'"
+          :label="gameMessage?gameMessage:'Start ' + (roundNumber+1) + ' Round'"
           @click="startRound"
         />
-      {{gameMessage}}
+
     </div>
     <div v-else-if="step === 1">
-      <div v-if="currentUser.isActive" class="bg-blue-grey-2" >
-        !!! Secret code:
-        <p class="inline-block" v-for="(num,i) in secretCode" :key="i">{{num}}</p>
-        <div class="q-pa-md" style="max-width: 400px">
-          <q-form
-            @submit="onSubmit"
-            @reset="onReset"
-            class="q-gutter-md"
-          >
-            <div v-if="currentUser.team === 'white'">
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="firstWord"
-                label="first association"
-                hint="use secret code numbers!!!"
-                :rules="[val => !!val || 'Field is required',
+      <div v-if="currentUser.isActive" class="relative-position" >
+        <div class="row justify-center q-mt-lg">
+          <div class="row column">
+            <div class="bg-grey text-center">Secret code:</div>
+            <div class="inline-block bg-dark q-pa-md">
+              <div class="inline-block bg-red q-px-sm" v-for="(num,i) in secretCode" :key="i">{{num}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="row justify-center q-my-sm">
+          <div class="q-pa-md bg-purple">
+            <q-form
+              @submit="onSubmit"
+              @reset="onReset"
+              class="q-gutter-md"
+            >
+              <div v-if="currentUser.team === 'white'" class="row justify-around">
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="firstWord"
+                  label="first association"
+                  hint="use secret code numbers!!!"
+                  :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[0]-1].indexOf(val)  === -1 ||
                        'You have the same association for this word']"
-              />
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="secondWord"
-                label="second association"
-                :rules="[val => !!val || 'Field is required',
+                />
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="secondWord"
+                  label="second association"
+                  :rules="[val => !!val || 'Field is required',
                         val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForWhiteSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
-              />
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="thirdWord"
-                label="third association"
-                :rules="[val => !!val || 'Field is required',
+                />
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="thirdWord"
+                  label="third association"
+                  :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
-              />
-            </div>
-            <div v-else>
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="firstWord"
-                label="first association"
-                hint="use secret code numbers!!!"
-                :rules="[val => !!val || 'Field is required',
+                />
+              </div>
+              <div v-else class="row justify-around">
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="firstWord"
+                  label="first association"
+                  hint="use secret code numbers!!!"
+                  :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[0]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
-              />
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="secondWord"
-                label="second association"
-                :rules="[val => !!val || 'Field is required',
+                />
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="secondWord"
+                  label="second association"
+                  :rules="[val => !!val || 'Field is required',
                         val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForBlackSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
-              />
-              <q-input
-                :disable="isBtnActive"
-                filled
-                v-model="thirdWord"
-                label="third association"
-                :rules="[val => !!val || 'Field is required',
+                />
+                <q-input
+                  class="q-mx-sm"
+                  :disable="isBtnActive"
+                  filled
+                  v-model="thirdWord"
+                  label="third association"
+                  :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
                        'You have the same association for this word']"
-              />
-            </div>
-            <div>
-              <q-btn :disable="isBtnActive" label="Submit" type="submit" color="primary"/>
-              <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-              <p v-if="isBtnActive">{{gameMessage}}</p>
-            </div>
-          </q-form>
+                />
+              </div>
+              <div>
+                <q-btn :disable="isBtnActive" label="Submit" type="submit" color="primary"/>
+                <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+                <p v-if="isBtnActive">{{gameMessage}}</p>
+              </div>
+            </q-form>
 
+          </div>
         </div>
-
       </div>
-      <div v-else>
-        <p>{{gameMessage}}</p>
+      <div v-else class="relative-position row justify-center">
+        <div class="q-ma-lg inline-block bg-purple">{{gameMessage}}</div>
       </div>
     </div>
-    <div v-else-if="step === 2" class="bg-orange">
-      <div class="flex justify-between">
-        <div>White team association:</div>
-        <div v-if="currentUser.team === 'white'"> It`s your team association! You should to guess this! </div>
-        <div v-else>If you guess this It`s very cool!!!</div>
+    <div
+      v-else-if="step === 2"
+      class="relative-position bg-purple-7"
+      style="max-width: 600px; margin: 15px auto 0;"
+    >
+      <div class="flex column justify-center">
+        <div class="text-center">White team association:</div>
+        <div class="text-center">
+        <div class="inline-block text-h5 q-mx-sm" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc}}</div>
+        </div>
+        <div class="text-center" v-if="currentUser.team === 'white'"> It`s your team association! You should to guess this! </div>
+        <div class="text-center" v-else>If you guess this It`s very cool!!!</div>
       </div>
-      <pre class="inline-block" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc+' | '}}</pre>
       <q-form
         @submit="sendTryToGuessSecretCode"
         @reset="onReset2(currentUser.team)"
@@ -290,7 +309,10 @@
         </div>
       </q-form>
     </div>
-    <div v-else-if="step === 3">
+    <div
+      v-else-if="step === 3"
+      class="relative-position"
+    >
      <div class="bg-secondary">
        <div>
          <div>White team try this secret code:
@@ -322,7 +344,7 @@
       />
       <p v-if="isBtnActive">{{gameMessage}}</p>
     </div>
-    <div v-else-if="step === 4" class="bg-orange">
+    <div v-else-if="step === 4" class="bg-orange relative-position">
       <div class="flex justify-between">
         <div>Black team association:</div>
         <div v-if="currentUser.team === 'black'"> It`s your team association! You should to guess this! </div>
@@ -452,7 +474,7 @@
         </div>
       </q-form>
     </div>
-    <div v-else-if="step === 5">
+    <div v-else-if="step === 5" class="relative-position">
       <div class="bg-secondary">
         <div>
           <div>White team try this secret code:
@@ -492,7 +514,7 @@
     <div v-else-if="isGameFinish">
       {{isGameFinish}}
     </div>
-    <div class="row justify-between">
+    <div class="row justify-between relative-position">
       <div>
         <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
           white
@@ -554,7 +576,7 @@
           </div>
         </div>
       </div>
-      <div v-if="allUsers.length>=4" class="absolute-bottom bg-indigo-8 chat" ref="chatMessage">
+      <div v-if="allUsers.length>=4" :class="isBlockSendMessage ? 'chatNone' : ''" class="absolute-bottom bg-indigo-8 chat" ref="chatMessage">
         <div class="q-pa-md  row justify-center">
           <div v-if="chat.length" style="width: 100%; max-width: 400px">
             <q-chat-message
@@ -983,13 +1005,13 @@ export default {
     }
   }
 }
-
+.chatNone { display: none }
 .chat {
   border-radius: 10px;
   overflow-y: auto;
   max-height: 250px;
   min-width: 300px;
-  max-width: 500px;
+  max-width: 300px;
   margin: 0 auto;
   &__input{
     width: 75%;

@@ -1,21 +1,23 @@
 <template>
-  <q-card
-    class="login-form"
-    :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
-  >
-    <q-img src="/statics/images/label_4.png"></q-img>
-    <div class="no-wrap items-center">
-      <div class="text-h6 ellipsis text-center">
-        Join to game
+  <div class="row justify-center">
+    <q-card
+      class="login-form q-mt-xl"
+      :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+    >
+      <q-img src="/statics/images/label_4.png"></q-img>
+      <div class="no-wrap items-center">
+        <div class="text-h6 ellipsis text-center">
+          Join to game
+        </div>
       </div>
-    </div>
-    <q-card-section class="column">
-      <q-input class="q-mb-md" filled v-model="nickname" color="accent" label="Nickname" dense ref="nickname" />
-      <q-input class="q-mb-md" filled v-model="room" color="accent" label="Room number" dense @keyup.enter="goToRegistration" />
-      <q-btn :disable="isCorrect" color="accent" label="GO" @click="goToRegistration" />
-      <div class="text-accent">{{error}}</div>
-    </q-card-section>
-  </q-card>
+      <q-card-section class="column">
+        <q-input class="q-mb-md" filled v-model="nickname" color="accent" label="Nickname" dense ref="nickname" />
+        <q-input class="q-mb-md" filled v-model="room" color="accent" label="Room number" dense @keyup.enter="goToRegistration" />
+        <q-btn :disable="isCorrect" color="accent" label="GO" @click="goToRegistration" />
+        <div class="text-accent">{{error}}</div>
+      </q-card-section>
+    </q-card>
+  </div>
 </template>
 
 <script>

@@ -1,17 +1,19 @@
 <template>
-  <q-card
-    class="login-form"
-    :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
-  >
-    <div class="row no-wrap items-center">
-      <div class="col text-h6 ellipsis text-center">
-        Setting
+  <div class="row justify-center">
+    <q-card
+      class="login-form  q-mt-xl"
+      :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+    >
+      <div class="row no-wrap items-center">
+        <div class="col text-h6 ellipsis text-center">
+          Setting
+        </div>
       </div>
-    </div>
-    <q-card-section class="column">
-      Game rules
-    </q-card-section>
-  </q-card>
+      <q-card-section class="column">
+        Game rules
+      </q-card-section>
+    </q-card>
+  </div>
 </template>
 
 <script>
