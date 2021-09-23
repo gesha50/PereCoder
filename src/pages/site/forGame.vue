@@ -1,10 +1,9 @@
 <template>
   <q-page class="">
-    <Particles
-      :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
+    <div
       id="particles-js"
-      :options="getStyle"
-    />
+      :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
+    ></div>
     <q-btn
       color="white"
       class="absolute-top-right"
@@ -20,7 +19,7 @@
       @click="confirm = true"
     />
     <div style="border-radius: 10px" class="bg-warning absolute-bottom-right">
-        <q-select @input="changedLang(lang)" filled v-model="lang" :options="options" />
+      <q-select @input="changedLang(lang)" filled v-model="lang" :options="options" />
     </div>
     <router-view></router-view>
     <q-dialog v-model="confirm" persistent>
@@ -41,7 +40,7 @@
 
 <script>
 export default {
-  name: "index",
+  name: "forGame",
   data() {
     return {
       confirm: false,
@@ -77,9 +76,6 @@ export default {
     },
   },
   computed:{
-    getStyle() {
-      return this.$store.getters['style/getStyle']
-    },
     currentRoutePath() {
       return this.$route.path;
     }
@@ -101,8 +97,5 @@ export default {
 }
 .dark_gradient {
   background: linear-gradient(145deg, rgb(11, 26, 61) 15%, #4c1014 70%);
-}
-.btnHome {
-  bottom: 200px
 }
 </style>

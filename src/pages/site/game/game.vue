@@ -1,27 +1,27 @@
 <template>
   <div>
     <div class="row justify-between no-wrap">
-      <div class="q-card bg-white q-ma-lg q-pa-sm">Your name: {{currentUser.name}}
+      <div class="q-card bg-white q-ma-lg q-pa-sm">{{currentUser.name}}
         <div>team: {{currentUser.team}}</div>
         <div v-if="step > 0" >Round # {{roundNumber}}</div>
         <div v-if="currentUser.team === 'white'">
           <div>
             <div v-if="whiteCounterHindrance===1">
-              <p class="bg-dark">x</p>
+              <div class="hindrance inline bg-dark text-accent">x</div>
             </div>
             <div v-else-if="whiteCounterHindrance===2">
-              <p class="bg-dark">x</p>
-              <p class="bg-dark">x</p>
+              <div class="hindrance inline bg-dark text-accent">x</div>
+              <div class="hindrance inline bg-dark text-accent">x</div>
             </div>
             <div v-else></div>
           </div>
           <div>
             <div v-if="whiteCounterInterception===1">
-              <p class="bg-yellow-1">v</p>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
             </div>
             <div v-if="whiteCounterInterception===2">
-              <p class="bg-yellow-1">v</p>
-              <p class="bg-yellow-1">v</p>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
             </div>
             <div v-else></div>
           </div>
@@ -29,21 +29,21 @@
         <div v-else>
           <div>
             <div v-if="blackCounterHindrance===1">
-              <p class="bg-dark">x</p>
+              <div class="hindrance inline bg-dark text-accent">x</div>
             </div>
             <div v-else-if="blackCounterHindrance===2">
-              <p class="bg-dark">x</p>
-              <p class="bg-dark">x</p>
+              <div class="hindrance inline bg-dark text-accent">x</div>
+              <div class="hindrance inline bg-dark text-accent">x</div>
             </div>
             <div v-else></div>
           </div>
           <div>
             <div v-if="blackCounterInterception===1">
-              <p class="bg-yellow-1">v</p>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
             </div>
             <div v-if="blackCounterInterception===2">
-              <p class="bg-yellow-1">v</p>
-              <p class="bg-yellow-1">v</p>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
             </div>
             <div v-else></div>
           </div>
@@ -51,13 +51,57 @@
       </div>
       <div class="fourGameWords q-card bg-red-12 q-mt-lg row items-center justify-around no-wrap">
         <div
-          class="inline-block bg-purple-6 q-pa-lg q-ma-lg text-subtitle1 text-weight-bold"
+          class="inline-block bg-purple-6 q-pa-md text-subtitle2 text-weight-bold"
           v-for="(word, i) in FOUR_GAME_WORDS"
           :key="i"
         >{{word}}</div>
       </div>
       <div class="q-card bg-white q-ma-lg q-pa-sm">
-        opponent teem
+        <div>team: {{currentUser.team==='white'?'black':'white'}}</div>
+        <div v-if="currentUser.team === 'black'">
+          <div>
+            <div v-if="whiteCounterHindrance===1">
+              <div class="hindrance inline bg-dark text-accent">x</div>
+            </div>
+            <div v-else-if="whiteCounterHindrance===2">
+              <div class="hindrance inline bg-dark text-accent">x</div>
+              <div class="hindrance inline bg-dark text-accent">x</div>
+            </div>
+            <div v-else></div>
+          </div>
+          <div>
+            <div v-if="whiteCounterInterception===1">
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+            </div>
+            <div v-if="whiteCounterInterception===2">
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+            </div>
+            <div v-else></div>
+          </div>
+        </div>
+        <div v-else>
+          <div>
+            <div v-if="blackCounterHindrance===1">
+              <div class="hindrance inline bg-dark text-accent">x</div>
+            </div>
+            <div v-else-if="blackCounterHindrance===2">
+              <div class="hindrance inline bg-dark text-accent">x</div>
+              <div class="hindrance inline bg-dark text-accent">x</div>
+            </div>
+            <div v-else></div>
+          </div>
+          <div>
+            <div v-if="blackCounterInterception===1">
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+            </div>
+            <div v-if="blackCounterInterception===2">
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+              <div class="bg-yellow-1 inline text-accent interception">v</div>
+            </div>
+            <div v-else></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -98,7 +142,11 @@
                   :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[0]-1].indexOf(val)  === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== thirdWord || '3 word same',
+                       val => val !== secondWord || '2 word same'
+                       ]"
+
                 />
                 <q-input
                   class="q-mx-sm"
@@ -109,7 +157,10 @@
                   :rules="[val => !!val || 'Field is required',
                         val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForWhiteSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== thirdWord || '3 word same',
+                       val => val !== firstWord || '1 word same'
+                       ]"
                 />
                 <q-input
                   class="q-mx-sm"
@@ -120,7 +171,10 @@
                   :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForWhiteSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== firstWord || '1 word same',
+                       val => val !== secondWord || '2 word same'
+                       ]"
                 />
               </div>
               <div v-else class="row justify-around">
@@ -134,7 +188,10 @@
                   :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[0]-1].indexOf(val) === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== thirdWord || '3 word same',
+                       val => val !== secondWord || '2 word same'
+                       ]"
                 />
                 <q-input
                   class="q-mx-sm"
@@ -145,7 +202,10 @@
                   :rules="[val => !!val || 'Field is required',
                         val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                        val => associationsForBlackSecretWords[secretCode[1]-1].indexOf(val) === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== thirdWord || '3 word same',
+                       val => val !== firstWord || '1 word same'
+                       ]"
                 />
                 <q-input
                   class="q-mx-sm"
@@ -156,11 +216,13 @@
                   :rules="[val => !!val || 'Field is required',
                       val=> FOUR_GAME_WORDS.indexOf(val) === -1 || 'This is one of main game word!',
                       val => associationsForBlackSecretWords[secretCode[2]-1].indexOf(val) === -1 ||
-                       'You have the same association for this word']"
+                       'You have the same association for this word',
+                       val => val !== firstWord || '1 word same',
+                       val => val !== secondWord || '2 word same']"
                 />
               </div>
               <div>
-                <q-btn :disable="isBtnActive" label="Submit" type="submit" color="primary"/>
+                <q-btn :disable="isBtnActive || isNotSameWords" label="Submit" type="submit" color="primary"/>
                 <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
                 <p v-if="isBtnActive">{{gameMessage}}</p>
               </div>
@@ -181,9 +243,11 @@
       <div class="flex column justify-center">
         <div class="text-center">White team association:</div>
         <div class="text-center">
-        <div class="inline-block text-h5 q-mx-sm" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc}}</div>
+          <div class="inline-block text-h5 q-mx-sm" v-for="(assoc, i) in threeWhiteAssociation" :key="i">{{assoc}}</div>
         </div>
-        <div class="text-center" v-if="currentUser.team === 'white'"> It`s your team association! You should to guess this! </div>
+        <div class="text-center" v-if="currentUser.team === 'white'">
+          It`s your team association! You should to guess this!
+        </div>
         <div class="text-center" v-else>If you guess this It`s very cool!!!</div>
       </div>
       <q-form
@@ -312,45 +376,96 @@
     <div
       v-else-if="step === 3"
       class="relative-position"
+      style="width: 80%;
+             margin: 20px auto 0;"
     >
-     <div class="bg-secondary">
-       <div>
-         <div>White team try this secret code:
-           <p   >{{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}</p>
+     <div class="flex justify-around">
+       <div class="q-card q-pa-sm bg-white">
+         <div class="row justify-center q-ma-lg">
+           <div class="row column">
+             <div class="bg-grey text-center">White try:</div>
+             <div class="inline-block bg-dark q-pa-md">
+               <div class="inline-block bg-red q-px-sm">
+                 {{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}
+               </div>
+             </div>
+           </div>
          </div>
-         <p v-if="isTryWhiteToGuessCorrect === 'true'"> correct! no counter for White team </p>
-         <div v-else> mistake!!!  your get counter hindrance <div class="bg-dark">x</div></div>
+         <div v-if="isTryWhiteToGuessCorrect === 'true'"
+              class="flex column justify-center"
+         >
+           <div class="text-center">correct!</div>
+           <div class="text-center">no counter</div>
+         </div>
+         <div v-else
+              class="flex column justify-center"
+         >
+           <div class="text-center">mistake!!!</div>
+           <div class="text-center">counter hindrance</div>
+           <div class="hindrance inline bg-dark text-accent">x</div>
+         </div>
        </div>
-       <div>
-         <div>Black team try this secret code:
-           <p   >{{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}</p>
+       <div class="q-card q-pa-sm bg-green">
+         <div class="text-center">correct</div>
+         <div class="row justify-center q-ma-lg">
+           <div class="row column">
+             <div class="bg-grey text-center">Secret code:</div>
+             <div class="inline-block bg-dark q-pa-md">
+               <div class="inline-block bg-red q-px-sm">
+                 {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+               </div>
+             </div>
+           </div>
          </div>
-         <div v-if="isTryBlackToGuessCorrect  === 'true'">
-           Bravo correct !! your get counter interception!
-           <div class="bg-yellow-1">v</div>
-         </div>
-         <p v-else> mistake! no counter for Black team </p>
        </div>
-       <div class="bg-red text-weight-bold text-h6">
-         correct secret code team white:
-         {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+       <div class="q-card q-pa-sm bg-black text-white">
+         <div class="row justify-center q-ma-lg">
+           <div class="row column">
+             <div class="bg-grey text-center">Black try:</div>
+             <div class="inline-block bg-dark q-pa-md">
+               <div class="inline-block bg-red q-px-sm">
+                 {{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}
+               </div>
+             </div>
+           </div>
+         </div>
+         <div v-if="isTryBlackToGuessCorrect  === 'true'"
+              class="flex column justify-center"
+         >
+           <div class="text-center">Bravo!</div>
+           <div class="text-center">counter interception</div>
+           <div class="bg-yellow-1 inline text-accent interception">v</div>
+         </div>
+         <div v-else class="flex column justify-center">
+           <div class="text-center">mistake!!!</div>
+           <div class="text-center">no counter</div>
+         </div>
        </div>
      </div>
-      <q-btn
-        @click="nextThreeWords"
-        :disable="isBtnActive"
-        label="Next"
-        color="primary"
-      />
-      <p v-if="isBtnActive">{{gameMessage}}</p>
-    </div>
-    <div v-else-if="step === 4" class="bg-orange relative-position">
-      <div class="flex justify-between">
-        <div>Black team association:</div>
-        <div v-if="currentUser.team === 'black'"> It`s your team association! You should to guess this! </div>
-        <div v-else>If you guess this It`s very cool!!!</div>
+      <div class="flex justify-center q-mt-sm">
+        <q-btn
+          @click="nextThreeWords"
+          :disable="isBtnActive"
+          :label="isBtnActive? gameMessage : 'Next Round'"
+          color="primary"
+        />
       </div>
-      <pre class="inline-block" v-for="(assoc, i) in threeBlackAssociation" :key="i">{{assoc+' | '}}</pre>
+    </div>
+    <div
+      v-else-if="step === 4"
+      class="relative-position bg-purple-7"
+      style="max-width: 600px; margin: 15px auto 0;"
+    >
+      <div class="flex column justify-center">
+        <div class="text-center">Black team association:</div>
+        <div class="text-center">
+          <div class="inline-block text-h5 q-mx-sm" v-for="(assoc, i) in threeBlackAssociation" :key="i">{{assoc}}</div>
+        </div>
+        <div v-if="currentUser.team === 'black'" class="text-center">
+          It`s your team association! You should to guess this!
+        </div>
+        <div v-else class="text-center">If you guess this It`s very cool!!!</div>
+      </div>
       <q-form
         @submit="sendTryToGuessSecretCode2"
         @reset="onReset2(currentUser.team)"
@@ -474,109 +589,84 @@
         </div>
       </q-form>
     </div>
-    <div v-else-if="step === 5" class="relative-position">
-      <div class="bg-secondary">
-        <div>
-          <div>White team try this secret code:
-            <p   >{{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}</p>
+    <div
+      v-else-if="step === 5"
+      class="relative-position"
+      style="width: 80%;
+             margin: 20px auto 0;"
+    >
+      <div class="flex justify-around">
+        <div class="q-card q-pa-sm bg-white">
+          <div class="row justify-center q-ma-lg">
+            <div class="row column">
+              <div class="bg-grey text-center">White try:</div>
+              <div class="inline-block bg-dark q-pa-md">
+                <div class="inline-block bg-red q-px-sm">
+                  {{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}
+                </div>
+              </div>
+            </div>
           </div>
-          <div v-if="isTryWhiteToGuessCorrect === 'true'">
-            Bravo correct !! your get counter interception!
-          <div class="bg-yellow-1">v</div>
+          <div v-if="isTryWhiteToGuessCorrect === 'true'" class="flex column justify-center">
+            <div class="text-center">Bravo!</div>
+            <div class="text-center">counter interception</div>
+            <div class="bg-yellow-1 inline text-accent interception">v</div>
           </div>
-          <div v-else> mistake! no counter for WHITE team </div>
+          <div v-else class="flex column justify-center">
+            <div class="text-center">mistake!</div>
+            <div class="text-center">no counter</div>
+          </div>
         </div>
-        <div>
-          <div>Black team try this secret code:
-            <p>{{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}</p>
-          </div>
-          <div v-if="isTryBlackToGuessCorrect  === 'true'">
-            Correct! no counter for White team
-          </div>
-          <div v-else>
-            mistake!!!  your get counter hindrance
-            <div class="bg-dark">x</div>
+        <div class="q-card q-pa-sm bg-green">
+          <div class="text-center">correct</div>
+          <div class="row justify-center q-ma-lg">
+            <div class="row column">
+              <div class="bg-grey text-center">Secret code:</div>
+              <div class="inline-block bg-dark q-pa-md">
+                <div class="inline-block bg-red q-px-sm">
+                  {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="bg-red text-weight-bold text-h6">
-          correct secret code team white:
-          {{correctFirstNumber +' '+ correctSecondNumber + ' '+ correctThirdNumber }}
+        <div class="q-card q-pa-sm bg-black text-white">
+          <div class="row justify-center q-ma-lg">
+            <div class="row column">
+              <div class="bg-grey text-center">Black try:</div>
+              <div class="inline-block bg-dark q-pa-md">
+                <div class="inline-block bg-red q-px-sm">
+                  {{firstNumberBlack +' '+ secondNumberBlack +' '+thirdNumberBlack }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="isTryBlackToGuessCorrect  === 'true'" class="flex column justify-center">
+            <div class="text-center">Correct!</div>
+            <div class="text-center">no counter</div>
+          </div>
+          <div v-else class="flex column justify-center">
+            <div class="text-center">mistake!</div>
+            <div class="text-center">counter hindrance</div>
+            <div class="hindrance inline bg-dark text-accent">x</div>
+          </div>
         </div>
       </div>
-      <q-btn
-        @click="finishAndStartRound"
-        :disable="isBtnActive"
-        label="Next Round"
-        color="primary"
-      />
-      <p v-if="isBtnActive">{{gameMessage}}</p>
+      <div class="flex justify-center q-mt-sm">
+        <q-btn
+          @click="finishAndStartRound"
+          :disable="isBtnActive"
+          :label="isBtnActive? gameMessage : 'Next Round'"
+          color="primary"
+        />
+      </div>
     </div>
     <div v-else-if="isGameFinish">
       {{isGameFinish}}
     </div>
-    <div class="row justify-between relative-position">
-      <div>
-        <div class="row justify-start" v-for="(obj,i) in listGameWhiteSide" :key="i">
-          white
-        <div class="q-px-md">
-          <div v-for="(word, ind1) in obj.threeWords" :key="ind1">{{word}}</div>
-        </div>
-        <div class="q-px-md">
-          <div v-if="currentUser.team==='white'">
-            <div v-for="(tryNumber, ind2) in obj.threeTryNumbersW" :key="ind2">{{tryNumber}}</div>
-          </div>
-          <div v-else>
-            <div v-for="(tryNumber, ind3) in obj.threeTryNumbersB" :key="ind3">{{tryNumber}}</div>
-          </div>
-        </div>
-        <div>
-          <div v-for="(correctNumber, ind4) in obj.threeCorrectNumbers" :key="ind4">{{correctNumber}}</div>
-        </div>
-      </div>
-        <div
-          class="row"
-          v-if="associationsForWhiteSecretWords[0].length ||
-              associationsForWhiteSecretWords[1].length"
-        >
-          <div class="q-mx-sm">
-            1
-            <div
-              v-for="(forFirstSecretWord, i1) in associationsForWhiteSecretWords[0]"
-              :key="i1"
-            >
-              {{forFirstSecretWord}}
-            </div>
-          </div>
-          <div class="q-mx-sm">
-            2
-            <div
-              v-for="(forSecondSecretWord, i2) in associationsForWhiteSecretWords[1]"
-              :key="i2"
-            >
-              {{forSecondSecretWord}}
-            </div>
-          </div>
-          <div class="q-mx-sm">
-            3
-            <div
-              v-for="(forThirdSecretWord, i3) in associationsForWhiteSecretWords[2]"
-              :key="i3"
-            >
-              {{forThirdSecretWord}}
-            </div>
-          </div>
-          <div class="q-mx-sm">
-            4
-            <div
-              v-for="(forFoursSecretWord, i4) in associationsForWhiteSecretWords[3]"
-              :key="i4"
-            >
-              {{forFoursSecretWord}}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="allUsers.length>=4" :class="isBlockSendMessage ? 'chatNone' : ''" class="absolute-bottom bg-indigo-8 chat" ref="chatMessage">
+    <div class="row justify-between absolute-bottom">
+      <q-btn label="white game list" color="white" class="text-black" @click="listGameWhite = !listGameWhite" />
+      <div v-if="allUsers.length>=4" :class="isBlockSendMessage ? 'chatNone' : ''" class="bg-indigo-8 chat" ref="chatMessage">
         <div class="q-pa-md  row justify-center">
           <div v-if="chat.length" style="width: 100%; max-width: 400px">
             <q-chat-message
@@ -601,65 +691,200 @@
           />
           <q-btn :disable="isBlockSendMessage" class="q-mx-md" round icon="send" @click="sendMessage" />
         </div>
-
       </div>
-      <div>
-        <div class="row justify-start" v-for="(obj,i) in listGameBlackSide" :key="i">
-          black
-          <div class="q-px-md">
-            <div v-for="(word, ind) in obj.threeWords" :key="ind">{{word}}</div>
-          </div>
-          <div class="q-px-md">
-            <div v-if="currentUser.team==='white'">
-              <div v-for="(tryNumber, ind) in obj.threeTryNumbersW" :key="ind">{{tryNumber}}</div>
+      <q-btn label="black game list" color="black" class="text-white" @click="listGameBlack = !listGameBlack" />
+    </div>
+    <div class="popup" :class="listGameWhite? '' : 'chatNone'" >
+      <div class="popup__area" @click="listGameWhite = false"></div>
+      <div class="listGameWhite">
+        <div class="row">
+          <div
+            class="col-6 row no-wrap"
+            v-for="(obj,i) in listGameWhiteSide"
+            :key="i"
+            style="border: 1px solid black"
+          >
+            <div class="col-12 row">
+              <div class="col-8">Round #{{i+1}}</div>
+              <div class="col-2 text-center">?</div>
+              <q-icon name="fas fa-key" class="col-2 text-white" />
+              <div class="col-8">
+                <div
+                  v-for="(word, ind1) in obj.threeWords"
+                  :key="ind1"
+                  :class="(ind1%2===0)? 'bg-grey-4'  : 'bg-white'"
+                >
+                  {{word}}
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div v-if="currentUser.team==='white'">
+                  <div
+                    v-for="(tryNumber, ind2) in obj.threeTryNumbersW"
+                    :key="ind2"
+                    :class="(ind2%2===0)? 'bg-grey-4'  : 'bg-white'"
+                  >
+                    {{tryNumber}}
+                  </div>
+                </div>
+                <div v-else>
+                  <div
+                    v-for="(tryNumber, ind3) in obj.threeTryNumbersB"
+                    :key="ind3"
+                    :class="(ind3%2===0)? 'bg-grey-4'  : 'bg-white'"
+                  >
+                    {{tryNumber}}
+                  </div>
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div
+                  v-for="(correctNumber, ind4) in obj.threeCorrectNumbers"
+                  :key="ind4"
+                  :class="(ind4%2===0)? 'bg-grey-4'  : 'bg-white'"
+                >
+                  {{correctNumber}}
+                </div>
+              </div>
             </div>
-            <div v-else>
-              <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind">{{tryNumber}}</div>
-            </div>
           </div>
-          <div>
-            <div v-for="(correctNumber, ind) in obj.threeCorrectNumbers" :key="ind">{{correctNumber}}</div>
+          <div
+            class="row col-12"
+            v-if="associationsForWhiteSecretWords[0].length ||
+              associationsForWhiteSecretWords[1].length"
+          >
+            <div class="col-3 bg-white">
+              1
+              <div
+                v-for="(forFirstSecretWord, i1) in associationsForWhiteSecretWords[0]"
+                :key="i1"
+              >
+                {{forFirstSecretWord}}
+              </div>
+            </div>
+            <div class="col-3 bg-grey-4">
+              2
+              <div
+                v-for="(forSecondSecretWord, i2) in associationsForWhiteSecretWords[1]"
+                :key="i2"
+              >
+                {{forSecondSecretWord}}
+              </div>
+            </div>
+            <div class="col-3 bg-white">
+              3
+              <div
+                v-for="(forThirdSecretWord, i3) in associationsForWhiteSecretWords[2]"
+                :key="i3"
+              >
+                {{forThirdSecretWord}}
+              </div>
+            </div>
+            <div class="col-3 bg-grey-4">
+              4
+              <div
+                v-for="(forFoursSecretWord, i4) in associationsForWhiteSecretWords[3]"
+                :key="i4"
+              >
+                {{forFoursSecretWord}}
+              </div>
+            </div>
           </div>
         </div>
-        <div
-          class="row"
-          v-if="associationsForBlackSecretWords[0].length ||
+    </div>
+    </div>
+    <div class="popup" :class="listGameBlack? '' : 'chatNone'" >
+      <div class="popup__area" @click="listGameBlack = false"></div>
+      <div class="listGameBlack">
+        <div class="row">
+          <div
+            class="col-6 row no-wrap"
+            v-for="(obj,i) in listGameBlackSide"
+            :key="i"
+            style="border: 1px solid black"
+          >
+            <div class="col-12 row">
+              <div class="col-8">Round #{{i+1}}</div>
+              <div class="col-2 text-center">?</div>
+              <q-icon name="fas fa-key" class="col-2 text-white" />
+              <div class="col-8">
+                <div
+                  v-for="(word, ind) in obj.threeWords"
+                  :key="ind"
+                  :class="(ind%2===0)? 'bg-grey-4'  : 'bg-white'"
+                >
+                  {{word}}
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div v-if="currentUser.team==='white'" >
+                  <div
+                    v-for="(tryNumber, ind) in obj.threeTryNumbersW"
+                    :key="ind"
+                    :class="(ind%2===0)? 'bg-grey-4'  : 'bg-white' "
+                  >
+                    {{tryNumber}}
+                  </div>
+                </div>
+                <div v-else>
+                  <div v-for="(tryNumber, ind) in obj.threeTryNumbersB" :key="ind"
+                       :class="(ind%2===0)? 'bg-grey-4'  : 'bg-white' "
+                  >
+                    {{tryNumber}}
+                  </div>
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div
+                  v-for="(correctNumber, ind) in obj.threeCorrectNumbers"
+                  :key="ind"
+                  :class="(ind%2===0)? 'bg-grey-4'  : 'bg-white' "
+                >
+                  {{correctNumber}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="row col-12"
+            v-if="associationsForBlackSecretWords[0].length ||
               associationsForBlackSecretWords[1].length"
-        >
-          <div class="q-mx-sm">
-            1
-            <div
-              v-for="(forFirstSecretWord, i1) in associationsForBlackSecretWords[0]"
-              :key="i1"
-            >
-              {{forFirstSecretWord}}
+          >
+            <div class="col-3 bg-grey-4">
+              1
+              <div
+                v-for="(forFirstSecretWord, i1) in associationsForBlackSecretWords[0]"
+                :key="i1"
+              >
+                {{forFirstSecretWord}}
+              </div>
             </div>
-          </div>
-          <div class="q-mx-sm">
-            2
-            <div
-              v-for="(forSecondSecretWord, i2) in associationsForBlackSecretWords[1]"
-              :key="i2"
-            >
-              {{forSecondSecretWord}}
+            <div class="col-3 bg-white">
+              2
+              <div
+                v-for="(forSecondSecretWord, i2) in associationsForBlackSecretWords[1]"
+                :key="i2"
+              >
+                {{forSecondSecretWord}}
+              </div>
             </div>
-          </div>
-          <div class="q-mx-sm">
-            3
-            <div
-              v-for="(forThirdSecretWord, i3) in associationsForBlackSecretWords[2]"
-              :key="i3"
-            >
-              {{forThirdSecretWord}}
+            <div class="col-3 bg-grey-4">
+              3
+              <div
+                v-for="(forThirdSecretWord, i3) in associationsForBlackSecretWords[2]"
+                :key="i3"
+              >
+                {{forThirdSecretWord}}
+              </div>
             </div>
-          </div>
-          <div class="q-mx-sm">
-            4
-            <div
-              v-for="(forFoursSecretWord, i4) in associationsForBlackSecretWords[3]"
-              :key="i4"
-            >
-              {{forFoursSecretWord}}
+            <div class="col-3 bg-white">
+              4
+              <div
+                v-for="(forFoursSecretWord, i4) in associationsForBlackSecretWords[3]"
+                :key="i4"
+              >
+                {{forFoursSecretWord}}
+              </div>
             </div>
           </div>
         </div>
@@ -680,6 +905,8 @@ export default {
       isPlayer: false,
       isActive: this.$store.state.socket.user.isActive,
       message: '',
+      listGameBlack: false,
+      listGameWhite: false,
     }
   },
   watch: {
@@ -716,6 +943,14 @@ export default {
         return true
       }
       this.disableMessageForSameNumbers = null
+      return false
+    },
+    isNotSameWords() {
+      if (this.firstWord === this.secondWord ||
+        this.secondWord === this.thirdWord ||
+        this.firstWord === this.thirdWord) {
+        return true
+      }
       return false
     },
     isBtnActive() {
@@ -899,6 +1134,7 @@ export default {
       })
     },
     onSubmit () {
+      console.log([this.firstWord,this.secondWord,this.thirdWord])
       this.$socket.emit('readyThreeWords',
         [[this.firstWord,this.secondWord,this.thirdWord], this.currentUser],
         dataFromServer => {
@@ -983,8 +1219,8 @@ export default {
 
 <style lang="scss">
 .fourGameWords {
-  width: 80%;
-  margin: 0 auto;
+  width: 60%;
+  margin: 15px auto 0;
 }
 
 .chatMessage {
@@ -1018,4 +1254,50 @@ export default {
     float: right;
   }
 }
+
+.hindrance, .interception {
+  border: 1px solid red;
+  line-height: 29px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  align-self: center;
+  text-align: center;
+}
+
+.listGameWhite {
+  width: 300px;
+  background: $grey-6;
+  position: absolute;
+  left: calc(50% - 150px);
+  top: calc(50% - 150px);
+}
+
+.listGameBlack {
+  width: 300px;
+  background: $grey-6;
+  position: absolute;
+  left: calc(50% - 150px);
+  top: calc(50% - 150px);
+}
+
+.popup {
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .7);
+  text-align: center;
+  &__area {
+    position: fixed;
+    z-index: 10001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 </style>

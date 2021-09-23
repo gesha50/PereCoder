@@ -103,7 +103,7 @@ export default {
       }
     },
     redirect(){
-      this.$router.push('/game')
+      this.$router.push('/go/game')
     }
   },
   sockets: {

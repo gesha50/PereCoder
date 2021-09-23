@@ -664,6 +664,7 @@ io.on("connection", socket => {
                         } else {
                           client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'superRound')
                           client.expire(`room:${dataFromClient[1].room}:whoIsWinner`, 60 * 60 * 2)
+                          io.to(dataFromClient[1].room).emit('whoIsWinner', 'superRound')
                         }
                       }
                       console.log(finishGame)
