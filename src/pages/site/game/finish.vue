@@ -16,6 +16,7 @@
       </div>
     </div>
     <q-card-section class="column">
+      Congratulations
       <div> Win:  {{whoIsWinner}}</div>
       <q-btn
         label=Home
