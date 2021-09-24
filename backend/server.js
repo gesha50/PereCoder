@@ -192,7 +192,6 @@ io.on("connection", socket => {
   })
 
   socket.on('setUserTeam', (dataFromClient, cbToClient) => {
-    console.log(dataFromClient)
     client.hmset(dataFromClient.user.id,
       'id', dataFromClient.user.id,
       'name', dataFromClient.user.name,
@@ -354,7 +353,6 @@ io.on("connection", socket => {
             blackActiveIndex = 0
           }
         }
-        console.log(blackActiveIndex)
         client.hgetall(keys[blackActiveIndex], function (e, activeUser){
           if (e) console.log(e)
           client.hmset(keys[blackActiveIndex],
@@ -651,7 +649,16 @@ io.on("connection", socket => {
                       cbToClient()
                       let  finishGame = isGameFinish(blackCounterHindrance, whiteCounterInterception,
                         whiteCounterHindrance, blackCounterInterception)
-                      if (finishGame) {
+                      if (finishGame || ROUND===8) {
+                        if (ROUND===8) {
+                          if (finishGame===0) {
+                            finishGame = isGameFinish(blackCounterHindrance+1, whiteCounterInterception+1,
+                              whiteCounterHindrance+1, blackCounterInterception+1)
+                          }
+                          if (finishGame===0) {
+                            finishGame = 'superRound'
+                          }
+                        }
                         endGame()
                         if (finishGame === 'blackWin') {
                           client.set(`room:${dataFromClient[1].room}:whoIsWinner`, 'black')

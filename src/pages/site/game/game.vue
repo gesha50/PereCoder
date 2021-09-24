@@ -222,9 +222,8 @@
                 />
               </div>
               <div>
-                <q-btn :disable="isBtnActive || isNotSameWords" label="Submit" type="submit" color="primary"/>
+                <q-btn :disable="isBtnActive || isNotSameWords" :label="gameMessage&&isBtnActive? gameMessage:'Submit'" type="submit" color="primary"/>
                 <q-btn :disable="isBtnActive" label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-                <p v-if="isBtnActive">{{gameMessage}}</p>
               </div>
             </q-form>
 
@@ -364,11 +363,11 @@
         <div>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive || notSameNumbers"
-            label="Submit" type="submit" color="primary"/>
+            :label="isBtnActive && gameMessage ? gameMessage : 'Submit'"
+            type="submit" color="primary"/>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'white') || isBtnActive"
             label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          <p v-if="isBtnActive">{{gameMessage}}</p>
           <p v-if="disableMessageForSameNumbers">{{disableMessageForSameNumbers}}</p>
         </div>
       </q-form>
@@ -446,7 +445,7 @@
         <q-btn
           @click="nextThreeWords"
           :disable="isBtnActive"
-          :label="isBtnActive? gameMessage : 'Next Round'"
+          :label="isBtnActive? gameMessage : 'Next'"
           color="primary"
         />
       </div>
@@ -580,11 +579,11 @@
         <div>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive || notSameNumbers"
-            label="Submit" type="submit" color="primary"/>
+            :label="isBtnActive && gameMessage ? gameMessage : 'Submit'"
+            type="submit" color="primary"/>
           <q-btn
             :disable="(currentUser.isActive && currentUser.team === 'black') || isBtnActive"
             label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          <p v-if="isBtnActive">{{gameMessage}}</p>
           <p v-if="disableMessageForSameNumbers">{{disableMessageForSameNumbers}}</p>
         </div>
       </q-form>
