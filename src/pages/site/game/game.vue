@@ -1166,7 +1166,15 @@ export default {
         arr = [Number(this.firstNumberWhite),Number(this.secondNumberWhite),Number(this.thirdNumberWhite)]
       }
       this.$socket.emit('nextTryToGuessSecretCode',
-        [arr, this.currentUser, this.roundNumber],
+        [
+          arr,
+          this.currentUser,
+          this.roundNumber,
+          [
+            this.whiteCounterHindrance, this.whiteCounterInterception,
+            this.blackCounterHindrance, this.blackCounterInterception
+          ]
+        ],
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListEnd()
@@ -1182,7 +1190,15 @@ export default {
         arr = [Number(this.firstNumberBlack),Number(this.secondNumberBlack),Number(this.thirdNumberBlack)]
       }
       this.$socket.emit('tryToGuessSecretCode',
-        [arr, this.currentUser, this.roundNumber],
+        [
+          arr,
+          this.currentUser,
+          this.roundNumber,
+          [
+            this.whiteCounterHindrance, this.whiteCounterInterception,
+            this.blackCounterHindrance, this.blackCounterInterception
+          ]
+        ],
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListMiddle()
