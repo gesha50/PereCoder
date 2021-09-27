@@ -1061,7 +1061,7 @@ export default {
       return this.$store.getters["socket/user"]
     },
     roundNumber() {
-      return this.$store.getters["socket/round"]
+      return Number(this.$store.getters["socket/round"])
     },
     allUsers() {
       return this.$store.getters["socket/users"]
@@ -1080,7 +1080,7 @@ export default {
       return name
     },
     startRound() {
-      this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
+      this.$socket.emit('startRound', [this.allUsers, this.currentUser, this.roundNumber], dataFromServer => {
         console.log(dataFromServer)
       })
     },
@@ -1097,7 +1097,7 @@ export default {
       })
       this.$socket.emit('finishRound', [this.allUsers, this.currentUser], dataFromServer => {
         console.log(dataFromServer)
-        this.$socket.emit('startRound', [this.allUsers, this.currentUser], dataFromServer => {
+        this.$socket.emit('startRound', [this.allUsers, this.currentUser, this.roundNumber], dataFromServer => {
           console.log(dataFromServer)
         })
       })
@@ -1135,7 +1135,7 @@ export default {
     onSubmit () {
       console.log([this.firstWord,this.secondWord,this.thirdWord])
       this.$socket.emit('readyThreeWords',
-        [[this.firstWord,this.secondWord,this.thirdWord], this.currentUser],
+        [[this.firstWord,this.secondWord,this.thirdWord], this.currentUser, this.roundNumber],
         dataFromServer => {
           console.log(dataFromServer)
         })
@@ -1147,7 +1147,7 @@ export default {
       },20000)
     },
     nextThreeWords () {
-      this.$socket.emit('nextThreeWords', this.currentUser,
+      this.$socket.emit('nextThreeWords', [this.currentUser, this.roundNumber],
         dataFromServer => {
           console.log(dataFromServer)
         })
@@ -1166,7 +1166,7 @@ export default {
         arr = [Number(this.firstNumberWhite),Number(this.secondNumberWhite),Number(this.thirdNumberWhite)]
       }
       this.$socket.emit('nextTryToGuessSecretCode',
-        [arr, this.currentUser],
+        [arr, this.currentUser, this.roundNumber],
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListEnd()
@@ -1182,7 +1182,7 @@ export default {
         arr = [Number(this.firstNumberBlack),Number(this.secondNumberBlack),Number(this.thirdNumberBlack)]
       }
       this.$socket.emit('tryToGuessSecretCode',
-        [arr, this.currentUser],
+        [arr, this.currentUser, this.roundNumber],
         dataFromServer => {
           setTimeout(() => {
             this.writeResultToListMiddle()

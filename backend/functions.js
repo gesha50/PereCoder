@@ -45,13 +45,13 @@ function getRoomNumber () {
 
 function isGameFinish(blHid, whIn, whHid, blIn) {
   if ((whHid<2 && whIn===2 && blIn<2 && blHid<2) ||
-    (whHid<2 && whIn<2 && blIn===2 && blHid<2) ||
+    (whHid<2 && whIn<2 && blIn<2 && blHid===2) ||
     (whHid===2 && whIn===2 && blIn<2 && blHid===2) ||
     (whHid<2 && whIn===2 && blIn===2 && blHid===2) ||
     (whHid<2 && whIn===2 && blIn<2 && blHid===2)){
     return 'whiteWin'
   }
-  if ((whHid<2 && whIn<2 && blIn<2 && blHid===2) ||
+  if ((whHid<2 && whIn<2 && blIn===2 && blHid<2) ||
     (whHid === 2 && whIn<2 && blIn<2 && blHid<2) ||
     (whHid===2 && whIn===2 && blIn===2 && blHid<2) ||
     (whHid===2 && whIn<2 && blIn===2 && blHid===2) ||
