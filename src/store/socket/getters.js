@@ -124,3 +124,7 @@ export function associationsForBlackSecretWords (state) {
 export function chat (state) {
   return state.chat
 }
+
+export function dictionary (state) {
+  return state.dictionary
+}

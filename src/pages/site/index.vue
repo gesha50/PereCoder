@@ -6,22 +6,11 @@
       :options="getStyle"
     />
     <q-btn
-      color="white"
-      class="absolute-top-right"
-      flat
-      round
-      @click="$q.dark.toggle()"
-      :icon="$q.dark.isActive ? 'nights_stay' : 'wb_sunny'"
-    />
-    <q-btn
       v-if="currentRoutePath !== '/'"
-      class="btnHome bg-warning absolute-bottom-left"
+      class="bg-warning absolute-top-left"
       label="Home"
       @click="confirm = true"
     />
-    <div style="border-radius: 10px" class="bg-warning absolute-bottom-right">
-        <q-select @input="changedLang(lang)" filled v-model="lang" :options="options" />
-    </div>
     <router-view></router-view>
     <q-dialog v-model="confirm" persistent>
       <q-card>
@@ -101,8 +90,5 @@ export default {
 }
 .dark_gradient {
   background: linear-gradient(145deg, rgb(11, 26, 61) 15%, #4c1014 70%);
-}
-.btnHome {
-  bottom: 200px
 }
 </style>

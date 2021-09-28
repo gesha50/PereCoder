@@ -15,6 +15,12 @@ export default {
       console.log('socket connected')
     }
   },
+  created() {
+    this.$i18n.locale = this.lang
+  },
+  updated() {
+    this.$i18n.locale = this.lang
+  },
 }
 </script>
 

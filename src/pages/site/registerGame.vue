@@ -2,7 +2,7 @@
   <div class="row justify-center">
     <q-card
       class="login-form q-mt-xl"
-      :style="$q.platform.is.mobile ? { width: '60%' } : { width: '50%' }"
+      :style="$q.platform.is.mobile ? { width: '80%' } : { width: '50%' }"
     >
       <p style="display: none">{{isGameRun}}</p>
       <div class="no-wrap items-center">
@@ -63,7 +63,10 @@ export default {
     },
     isGameRun() {
       return this.$store.getters["socket/isGameRun"]
-    }
+    },
+    dictionary() {
+      return this.$store.getters["socket/dictionary"]
+    },
   },
   update() {
     console.log('update')
@@ -95,7 +98,7 @@ export default {
     },
     startGame() {
       if (this.currentUser.players === this.allUsers.length) {
-        this.$socket.emit('startGame', this.currentUser, dataFromServer => {
+        this.$socket.emit('startGame', [this.currentUser, this.dictionary], dataFromServer => {
           console.log(dataFromServer)
         })
       } else {

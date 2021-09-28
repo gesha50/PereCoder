@@ -5,22 +5,11 @@
       :class="$q.dark.isActive ? 'dark_gradient' : 'normal_gradient'"
     ></div>
     <q-btn
-      color="white"
-      class="absolute-top-right"
-      flat
-      round
-      @click="$q.dark.toggle()"
-      :icon="$q.dark.isActive ? 'nights_stay' : 'wb_sunny'"
-    />
-    <q-btn
       v-if="currentRoutePath !== '/'"
-      class="btnHome bg-warning absolute-bottom-left"
+      class="btnHome bg-warning absolute-top-left"
       label="Home"
       @click="confirm = true"
     />
-    <div style="border-radius: 10px" class="bg-warning absolute-bottom-right">
-      <q-select @input="changedLang(lang)" filled v-model="lang" :options="options" />
-    </div>
     <router-view></router-view>
     <q-dialog v-model="confirm" persistent>
       <q-card>
@@ -44,23 +33,9 @@ export default {
   data() {
     return {
       confirm: false,
-      lang: this.$store.getters["header/getLang"],
-      options: [
-        'en-us',
-        'ru',
-      ]
     }
   },
-  created() {
-    this.$i18n.locale = this.lang
-  },
-  updated() {
-    this.$i18n.locale = this.lang
-  },
   methods: {
-    changedLang(val) {
-      this.$store.dispatch('header/setLang', val)
-    },
     newMes() {
       // console.log(this.$socket)
       this.$socket.emit('createMessage', {

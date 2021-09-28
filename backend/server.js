@@ -8,7 +8,7 @@ const users = require('./users')()
 const redis = require("redis")
 const {contains, getThreeNumbers, isGameFinish, getRoomNumber, isRoomExist} = require("./functions")
 const client = redis.createClient()
-const { DICTIONARY_CLASSIC } = require('./dictionaries')
+const { DICTIONARY_CLASSIC, DICTIONARY_BIBLE } = require('./dictionaries')
 
 client.on("connect", function(connect) {
   console.log('connect to redis');
@@ -194,26 +194,31 @@ io.on("connection", socket => {
   // all others people redirect to game
 
   socket.on('startGame', (dataFromClient, cbToClient) => {
-    client.set(`room:${dataFromClient.room}:roundNumber`, 0)
-    client.expire(`room:${dataFromClient.room}:roundNumber`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:roundNumber`, 0)
+    client.expire(`room:${dataFromClient[0].room}:roundNumber`,  60 * 60 * 2)
 
-    client.set(`room:${dataFromClient.room}:isWhiteBtnPress`, 'false')
-    client.expire(`room:${dataFromClient.room}:isWhiteBtnPress`,  60 * 60 * 2)
-    client.set(`room:${dataFromClient.room}:isBlackBtnPress`, 'false')
-    client.expire(`room:${dataFromClient.room}:isBlackBtnPress`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:isWhiteBtnPress`, 'false')
+    client.expire(`room:${dataFromClient[0].room}:isWhiteBtnPress`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:isBlackBtnPress`, 'false')
+    client.expire(`room:${dataFromClient[0].room}:isBlackBtnPress`,  60 * 60 * 2)
 
-    client.set(`room:${dataFromClient.room}:whiteActiveIndex`, 0)
-    client.expire(`room:${dataFromClient.room}:whiteActiveIndex`,  60 * 60 * 2)
-    client.set(`room:${dataFromClient.room}:blackActiveIndex`, 0)
-    client.expire(`room:${dataFromClient.room}:blackActiveIndex`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:whiteActiveIndex`, 0)
+    client.expire(`room:${dataFromClient[0].room}:whiteActiveIndex`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:blackActiveIndex`, 0)
+    client.expire(`room:${dataFromClient[0].room}:blackActiveIndex`,  60 * 60 * 2)
 
     isGameRun = true
-    client.set(`room:${dataFromClient.room}:game-status`, isGameRun, redis.print)
-    client.expire(`room:${dataFromClient.room}:game-status`,  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:game-status`, isGameRun, redis.print)
+    client.expire(`room:${dataFromClient[0].room}:game-status`,  60 * 60 * 2)
     let i=0
     let uniqueIndexForDictionary = []
     while (i<8) {
-      let indexInDictionary = Math.floor(0 + Math.random() * (DICTIONARY_CLASSIC.length-1 + 1 - 0))
+      let indexInDictionary
+      if (dataFromClient[1] === 'bible') {
+        indexInDictionary = Math.floor(0 + Math.random() * (DICTIONARY_BIBLE.length-1 + 1 - 0))
+      } else {
+        indexInDictionary = Math.floor(0 + Math.random() * (DICTIONARY_CLASSIC.length-1 + 1 - 0))
+      }
       if (i === 0) {
         uniqueIndexForDictionary.push(indexInDictionary)
         i++
@@ -227,20 +232,28 @@ io.on("connection", socket => {
     let FOUR_WORDS_WHITE = []
     let FOUR_WORDS_BLACK = []
     for (let i=0; i<uniqueIndexForDictionary.length;i++) {
-      if (i<4) {
-        FOUR_WORDS_WHITE.push(DICTIONARY_CLASSIC[uniqueIndexForDictionary[i]])
+      if (dataFromClient[1] === 'bible') {
+        if (i<4) {
+          FOUR_WORDS_WHITE.push(DICTIONARY_BIBLE[uniqueIndexForDictionary[i]])
+        } else {
+          FOUR_WORDS_BLACK.push(DICTIONARY_BIBLE[uniqueIndexForDictionary[i]])
+        }
       } else {
-        FOUR_WORDS_BLACK.push(DICTIONARY_CLASSIC[uniqueIndexForDictionary[i]])
+        if (i<4) {
+          FOUR_WORDS_WHITE.push(DICTIONARY_CLASSIC[uniqueIndexForDictionary[i]])
+        } else {
+          FOUR_WORDS_BLACK.push(DICTIONARY_CLASSIC[uniqueIndexForDictionary[i]])
+        }
       }
     }
-    client.set('FOUR_WORDS_WHITE', JSON.stringify(FOUR_WORDS_WHITE), redis.print)
-    client.set('FOUR_WORDS_BLACK', JSON.stringify(FOUR_WORDS_BLACK), redis.print)
-    client.expire('FOUR_WORDS_WHITE',  60 * 60 * 2)
-    client.expire('FOUR_WORDS_BLACK',  60 * 60 * 2)
+    client.set(`room:${dataFromClient[0].room}:FOUR_WORDS_WHITE`, JSON.stringify(FOUR_WORDS_WHITE), redis.print)
+    client.set(`room:${dataFromClient[0].room}:FOUR_WORDS_BLACK`, JSON.stringify(FOUR_WORDS_BLACK), redis.print)
+    client.expire(`room:${dataFromClient[0].room}:FOUR_WORDS_WHITE`,  60 * 60 * 2)
+    client.expire(`room:${dataFromClient[0].room}:FOUR_WORDS_BLACK`,  60 * 60 * 2)
 
-    client.get(`room:${dataFromClient.room}:roundNumber`, function (err, round) {
+    client.get(`room:${dataFromClient[0].room}:roundNumber`, function (err, round) {
       if (err) console.log(err)
-      io.to(dataFromClient.room).emit('setGameStatus', isGameRun, Number(round))
+      io.to(dataFromClient[0].room).emit('setGameStatus', isGameRun, Number(round))
       cbToClient('ok')
     })
   })
@@ -254,8 +267,8 @@ io.on("connection", socket => {
       let multi = client.multi()
       let FOUR_WORDS_BLACK = ''
       let FOUR_WORDS_WHITE = ''
-      multi.get('FOUR_WORDS_BLACK')
-      multi.get('FOUR_WORDS_WHITE')
+      multi.get(`room:${dataFromClient.room}:FOUR_WORDS_BLACK`)
+      multi.get(`room:${dataFromClient.room}:FOUR_WORDS_WHITE`)
       multi.exec(function (err, replies) {
         FOUR_WORDS_BLACK = JSON.parse(replies[0])
         FOUR_WORDS_WHITE = JSON.parse(replies[1])

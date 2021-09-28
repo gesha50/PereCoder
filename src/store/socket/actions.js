@@ -15,3 +15,7 @@ export function allDataNull ({commit}) {
   commit('allDataNull')
 }
 
+export function setDictionary ({ commit }, value) {
+  commit('setDictionary', value)
+}
+

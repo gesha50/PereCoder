@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-center">
     <q-card
-      class="login-form q-mt-xl"
+      class="login-form"
       :style="$q.platform.is.mobile ? { width: '60%' } : { width: '80%' }"
     >
       <q-img src="/statics/images/label_1.jpg"></q-img>
@@ -31,5 +31,6 @@ export default {
 .login-form {
   position: absolute;
   max-width: 500px;
+  top: calc(50% - 250px)
 }
 </style>

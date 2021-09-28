@@ -6,7 +6,7 @@
     >
       <div class="row no-wrap items-center">
         <div class="col text-h6 ellipsis text-center">
-          Setting
+          Game rules
         </div>
       </div>
       <q-card-section class="column">
@@ -22,6 +22,10 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+.login-form {
+  position: absolute;
+  max-width: 500px;
+  top: calc(50% - 250px)
+}
 </style>

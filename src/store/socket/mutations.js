@@ -261,3 +261,7 @@ function end(state) {
   state.whoIsWinner = null
 }
 
+export function setDictionary (state, value) {
+  state.dictionary = value
+}
+

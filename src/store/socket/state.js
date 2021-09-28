@@ -1,5 +1,6 @@
 export default function () {
   return {
+    dictionary: 'classic',
     ROUND: 0,
     user: null,
     users: [],

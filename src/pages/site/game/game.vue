@@ -1,110 +1,122 @@
 <template>
   <div>
-    <div class="row justify-between no-wrap">
-      <div class="q-card bg-white q-ma-lg q-pa-sm">{{currentUser.name}}
-        <div>team: {{currentUser.team}}</div>
-        <div v-if="step > 0" >Round # {{roundNumber}}</div>
-        <div v-if="currentUser.team === 'white'">
-          <div>
-            <div v-if="whiteCounterHindrance===1">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else-if="whiteCounterHindrance===2">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else></div>
-          </div>
-          <div>
-            <div v-if="whiteCounterInterception===1">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-if="whiteCounterInterception===2">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-else></div>
-          </div>
+    <div
+      class="absolute-top-right q-pr-sm"
+      v-if="step > 0" >
+      Round # {{roundNumber}}
+    </div>
+    <div class="row justify-center no-wrap">
+      <div class="q-card bg-white q-ma-lg q-pa-sm row">
+        <div class="">
+          <div class="">{{currentUser.name}}</div>
+          <div>team: {{currentUser.team}}</div>
         </div>
-        <div v-else>
-          <div>
-            <div v-if="blackCounterHindrance===1">
-              <div class="hindrance inline bg-dark text-accent">x</div>
+        <div class="">
+          <div v-if="currentUser.team === 'white'">
+            <div>
+              <div v-if="whiteCounterHindrance===1">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else-if="whiteCounterHindrance===2">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else></div>
             </div>
-            <div v-else-if="blackCounterHindrance===2">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-              <div class="hindrance inline bg-dark text-accent">x</div>
+            <div>
+              <div v-if="whiteCounterInterception===1">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-if="whiteCounterInterception===2">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-else></div>
             </div>
-            <div v-else></div>
           </div>
-          <div>
-            <div v-if="blackCounterInterception===1">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
+          <div v-else>
+            <div>
+              <div v-if="blackCounterHindrance===1">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else-if="blackCounterHindrance===2">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else></div>
             </div>
-            <div v-if="blackCounterInterception===2">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
+            <div>
+              <div v-if="blackCounterInterception===1">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-if="blackCounterInterception===2">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-else></div>
             </div>
-            <div v-else></div>
           </div>
         </div>
       </div>
-      <div class="fourGameWords q-card bg-red-12 q-mt-lg row items-center justify-around no-wrap">
+      <div class="q-card bg-white q-ma-lg q-pa-sm row">
+        <div>team: {{currentUser.team==='white'?'black':'white'}}</div>
+        <div class="q-ml-sm">
+          <div v-if="currentUser.team === 'black'">
+            <div>
+              <div v-if="whiteCounterHindrance===1">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else-if="whiteCounterHindrance===2">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else></div>
+            </div>
+            <div>
+              <div v-if="whiteCounterInterception===1">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-if="whiteCounterInterception===2">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-else></div>
+            </div>
+          </div>
+          <div v-else>
+            <div>
+              <div v-if="blackCounterHindrance===1">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else-if="blackCounterHindrance===2">
+                <div class="hindrance inline bg-dark text-accent">x</div>
+                <div class="hindrance inline bg-dark text-accent">x</div>
+              </div>
+              <div v-else></div>
+            </div>
+            <div>
+              <div v-if="blackCounterInterception===1">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-if="blackCounterInterception===2">
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+                <div class="bg-yellow-1 inline text-accent interception">v</div>
+              </div>
+              <div v-else></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-center full-width">
+      <div class="fourGameWords q-card bg-red-12 q-mt-lg q-pa-sm row items-center justify-around no-wrap">
         <div
           class="inline-block bg-purple-6 q-pa-md text-subtitle2 text-weight-bold"
           v-for="(word, i) in FOUR_GAME_WORDS"
           :key="i"
         >{{word}}</div>
       </div>
-      <div class="q-card bg-white q-ma-lg q-pa-sm">
-        <div>team: {{currentUser.team==='white'?'black':'white'}}</div>
-        <div v-if="currentUser.team === 'black'">
-          <div>
-            <div v-if="whiteCounterHindrance===1">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else-if="whiteCounterHindrance===2">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else></div>
-          </div>
-          <div>
-            <div v-if="whiteCounterInterception===1">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-if="whiteCounterInterception===2">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-else></div>
-          </div>
-        </div>
-        <div v-else>
-          <div>
-            <div v-if="blackCounterHindrance===1">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else-if="blackCounterHindrance===2">
-              <div class="hindrance inline bg-dark text-accent">x</div>
-              <div class="hindrance inline bg-dark text-accent">x</div>
-            </div>
-            <div v-else></div>
-          </div>
-          <div>
-            <div v-if="blackCounterInterception===1">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-if="blackCounterInterception===2">
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-              <div class="bg-yellow-1 inline text-accent interception">v</div>
-            </div>
-            <div v-else></div>
-          </div>
-        </div>
-      </div>
     </div>
-
     <div class="q-mt-xl flex justify-center" v-if="step === 0">
         <q-btn
           :disable="isBtnActive"
@@ -254,7 +266,7 @@
         @reset="onReset2(currentUser.team)"
         class="q-gutter-md"
       >
-        <div class="q-gutter-md row justify-center" v-if="currentUser.team === 'white'">
+        <div class="q-gutter-md row justify-center no-wrap" v-if="currentUser.team === 'white'">
           <div>
             <q-input
               :disable="currentUser.isActive || isBtnActive"
@@ -307,7 +319,7 @@
             />
           </div>
         </div>
-        <div class="q-gutter-md row justify-center" v-else>
+        <div class="q-gutter-md row justify-center no-wrap" v-else>
           <div>
             <q-input
             :disable="isBtnActive"
@@ -375,16 +387,16 @@
     <div
       v-else-if="step === 3"
       class="relative-position"
-      style="width: 80%;
+      style="width: 100%;
              margin: 20px auto 0;"
     >
-     <div class="flex justify-around">
+     <div class="flex justify-around no-wrap">
        <div class="q-card q-pa-sm bg-white">
-         <div class="row justify-center q-ma-lg">
+         <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
            <div class="row column">
              <div class="bg-grey text-center">White try:</div>
              <div class="inline-block bg-dark q-pa-md">
-               <div class="inline-block bg-red q-px-sm">
+               <div class="bg-red q-px-sm">
                  {{firstNumberWhite +' '+ secondNumberWhite +' '+thirdNumberWhite }}
                </div>
              </div>
@@ -406,7 +418,7 @@
        </div>
        <div class="q-card q-pa-sm bg-green">
          <div class="text-center">correct</div>
-         <div class="row justify-center q-ma-lg">
+         <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
            <div class="row column">
              <div class="bg-grey text-center">Secret code:</div>
              <div class="inline-block bg-dark q-pa-md">
@@ -418,7 +430,7 @@
          </div>
        </div>
        <div class="q-card q-pa-sm bg-black text-white">
-         <div class="row justify-center q-ma-lg">
+         <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
            <div class="row column">
              <div class="bg-grey text-center">Black try:</div>
              <div class="inline-block bg-dark q-pa-md">
@@ -470,7 +482,7 @@
         @reset="onReset2(currentUser.team)"
         class="q-gutter-md"
       >
-        <div class="q-gutter-md row justify-center" v-if="currentUser.team === 'white'">
+        <div class="q-gutter-md row justify-center no-wrap" v-if="currentUser.team === 'white'">
           <div>
             <q-input
               :disable="isBtnActive"
@@ -523,7 +535,7 @@
             />
           </div>
         </div>
-        <div class="q-gutter-md row justify-center" v-else>
+        <div class="q-gutter-md row justify-center no-wrap" v-else>
           <div>
             <q-input
               :disable="currentUser.isActive || isBtnActive"
@@ -591,12 +603,12 @@
     <div
       v-else-if="step === 5"
       class="relative-position"
-      style="width: 80%;
+      style="width: 100%;
              margin: 20px auto 0;"
     >
-      <div class="flex justify-around">
+      <div class="flex justify-around no-wrap">
         <div class="q-card q-pa-sm bg-white">
-          <div class="row justify-center q-ma-lg">
+          <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
             <div class="row column">
               <div class="bg-grey text-center">White try:</div>
               <div class="inline-block bg-dark q-pa-md">
@@ -618,7 +630,7 @@
         </div>
         <div class="q-card q-pa-sm bg-green">
           <div class="text-center">correct</div>
-          <div class="row justify-center q-ma-lg">
+          <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
             <div class="row column">
               <div class="bg-grey text-center">Secret code:</div>
               <div class="inline-block bg-dark q-pa-md">
@@ -630,7 +642,7 @@
           </div>
         </div>
         <div class="q-card q-pa-sm bg-black text-white">
-          <div class="row justify-center q-ma-lg">
+          <div class="row justify-center" :class="$q.platform.is.mobile ? '' : 'q-ma-lg'">
             <div class="row column">
               <div class="bg-grey text-center">Black try:</div>
               <div class="inline-block bg-dark q-pa-md">
@@ -663,9 +675,12 @@
     <div v-else-if="isGameFinish">
       {{isGameFinish}}
     </div>
-    <div class="row justify-between absolute-bottom">
-      <q-btn label="white game list" color="white" class="text-black" @click="listGameWhite = !listGameWhite" />
-      <div v-if="allUsers.length>=4" :class="isBlockSendMessage ? 'chatNone' : ''" class="bg-indigo-8 chat" ref="chatMessage">
+    <div class="full-width absolute-bottom" style="bottom: 36px">
+      <div
+        v-if="allUsers.length>=4" :class="isBlockSendMessage ? 'chatNone' : ''"
+        class="bg-indigo-8 full-width chat"
+        ref="chatMessage"
+      >
         <div class="q-pa-md  row justify-center">
           <div v-if="chat.length" style="width: 100%; max-width: 400px">
             <q-chat-message
@@ -691,7 +706,16 @@
           <q-btn :disable="isBlockSendMessage" class="q-mx-md" round icon="send" @click="sendMessage" />
         </div>
       </div>
-      <q-btn label="black game list" color="black" class="text-white" @click="listGameBlack = !listGameBlack" />
+    </div>
+    <div class="row justify-between absolute-bottom">
+      <q-btn
+        label="white game list" color="white" class="text-black" @click="listGameWhite = !listGameWhite"
+        style="width: 50%"
+      />
+      <q-btn
+        label="black game list" color="black" class="text-white" @click="listGameBlack = !listGameBlack"
+        style="width: 50%"
+      />
     </div>
     <div class="popup" :class="listGameWhite? '' : 'chatNone'" >
       <div class="popup__area" @click="listGameWhite = false"></div>
@@ -1234,8 +1258,8 @@ export default {
 
 <style lang="scss">
 .fourGameWords {
-  width: 60%;
-  margin: 15px auto 0;
+  width: 80%;
+  margin: 0 auto;
 }
 
 .chatMessage {
@@ -1260,9 +1284,8 @@ export default {
 .chat {
   border-radius: 10px;
   overflow-y: auto;
-  max-height: 250px;
+  max-height: 200px;
   min-width: 300px;
-  max-width: 300px;
   margin: 0 auto;
   &__input{
     width: 75%;
